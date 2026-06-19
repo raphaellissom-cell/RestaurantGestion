@@ -26,6 +26,9 @@ public class CommandeDAO {
             if (table == null) {
                 throw new IllegalArgumentException("Table introuvable : " + idTable);
             }
+            if ("Occupée".equals(table.getStatut())) {
+                throw new IllegalStateException("La table " + idTable + " est déjà occupée");
+            }
 
             Commande commande = new Commande();
             commande.setTable(table);

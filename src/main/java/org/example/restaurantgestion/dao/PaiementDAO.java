@@ -20,6 +20,9 @@ public class PaiementDAO {
 
             em.persist(new Paiement(commande, modePaiement, montant));
             commande.setStatut("Payée");
+            if (commande.getTable() != null) {
+                commande.getTable().setStatut("Libre");
+            }
             tx.commit();
             System.out.println("Paiement de " + montant + " FCFA validé par " + modePaiement);
         } catch (Exception e) {
