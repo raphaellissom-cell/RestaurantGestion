@@ -87,6 +87,7 @@ public class MenuView extends VBox {
     private void setupTable() {
         table.getStyleClass().add("erp-table");
         VBox.setVgrow(table, Priority.ALWAYS);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<Produit, String> colNom = new TableColumn<>("Nom");
         colNom.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getNom()));
@@ -128,23 +129,42 @@ public class MenuView extends VBox {
 
         TableColumn<Produit, String> colDescription = new TableColumn<>("Description");
         colDescription.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getDescription()));
-        colDescription.setPrefWidth(250);
+        colDescription.setPrefWidth(180);
 
         TableColumn<Produit, Void> colActions = new TableColumn<>("");
-        colActions.setPrefWidth(80);
+        colActions.setPrefWidth(220);
         colActions.setCellFactory(col -> new TableCell<>() {
-            private final Button btnEdit = new Button("Détail");
+            private final Button btnDetail = new Button("Détail");
+            private final Button btnEdit = new Button("Modifier");
+            private final Button btnDelete = new Button("Supprimer");
+            private final HBox box = new HBox(4);
             {
+                box.setAlignment(Pos.CENTER);
+                btnDetail.getStyleClass().add("erp-action-btn");
                 btnEdit.getStyleClass().add("erp-action-btn");
-                btnEdit.setOnAction(e -> {
+                btnDelete.getStyleClass().addAll("erp-action-btn", "erp-action-btn-danger");
+
+                btnDetail.setOnAction(e -> {
                     Produit p = getTableView().getItems().get(getIndex());
                     afficherDetailsProduit(p);
+                });
+                btnEdit.setOnAction(e -> {
+                    Produit p = getTableView().getItems().get(getIndex());
+                    ProductDialog dialog = new ProductDialog(p);
+                    dialog.showAndWait();
+                    chargerDonnees();
+                });
+                btnDelete.setOnAction(e -> {
+                    Produit p = getTableView().getItems().get(getIndex());
+                    supprimerProduit(p);
                 });
             }
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : btnEdit);
+                if (empty) { setGraphic(null); return; }
+                box.getChildren().setAll(btnDetail, btnEdit, btnDelete);
+                setGraphic(box);
             }
         });
 
@@ -326,5 +346,27 @@ public class MenuView extends VBox {
         );
         detailsStage.setScene(scene);
         detailsStage.showAndWait();
+    }
+
+    private void supprimerProduit(Produit produit) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+            "Supprimer le produit \"" + produit.getNom() + "\" ?\nCette action est irréversible.",
+            ButtonType.YES, ButtonType.NO);
+        confirm.setHeaderText(null);
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES) {
+                try {
+                    produitDAO.supprimerProduit(produit.getId());
+                    chargerDonnees();
+                    new Alert(Alert.AlertType.INFORMATION,
+                        "Produit \"" + produit.getNom() + "\" supprimé avec succès.",
+                        ButtonType.OK).showAndWait();
+                } catch (Exception ex) {
+                    new Alert(Alert.AlertType.ERROR,
+                        "Impossible de supprimer ce produit :\n" + ex.getMessage(),
+                        ButtonType.OK).showAndWait();
+                }
+            }
+        });
     }
 }

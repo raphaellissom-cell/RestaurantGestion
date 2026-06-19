@@ -19,7 +19,6 @@ import org.example.restaurantgestion.models.Produit;
 import org.example.restaurantgestion.models.ProduitIngredient;
 import org.example.restaurantgestion.models.Stock;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDialog extends Stage {
@@ -38,9 +37,16 @@ public class ProductDialog extends Stage {
     private final TableView<IngredientPanier> tableIngredients = new TableView<>();
     private final ObservableList<IngredientPanier> ingredientList = FXCollections.observableArrayList();
 
+    private final Produit editingProduit;
+
     public ProductDialog() {
+        this(null);
+    }
+
+    public ProductDialog(Produit produit) {
+        this.editingProduit = produit;
         initModality(Modality.APPLICATION_MODAL);
-        setTitle("Ajouter un produit");
+        setTitle(produit == null ? "Ajouter un produit" : "Modifier le produit");
         setAlwaysOnTop(true);
         setResizable(false);
 
@@ -100,7 +106,6 @@ public class ProductDialog extends Stage {
         dispoBox.getChildren().addAll(lblDispo, chkDisponible);
         grid.add(dispoBox, 0, 5, 2, 1);
 
-        // --- Ingrédients section ---
         Label lblIngSection = new Label("Ingrédients");
         lblIngSection.setStyle("-fx-font-size: 14px; -fx-font-weight: 800; -fx-text-fill: #111827; -fx-padding: 8px 0 0 0;");
 
@@ -127,10 +132,9 @@ public class ProductDialog extends Stage {
         VBox ingSection = new VBox(8);
         ingSection.getChildren().addAll(lblIngSection, ingAddRow, tableIngredients);
 
-        // --- Buttons ---
         HBox btnBox = new HBox(12);
         btnBox.setAlignment(Pos.CENTER_RIGHT);
-        Button btnEnregistrer = new Button("Enregistrer");
+        Button btnEnregistrer = new Button(produit == null ? "Enregistrer" : "Modifier");
         btnEnregistrer.getStyleClass().add("button-primary");
         btnEnregistrer.setOnAction(e -> enregistrerProduit());
 
@@ -152,6 +156,27 @@ public class ProductDialog extends Stage {
         setMinHeight(650);
 
         chargerIngredients();
+        if (produit != null) {
+            remplirChamps(produit);
+        }
+    }
+
+    private void remplirChamps(Produit produit) {
+        txtNom.setText(produit.getNom());
+        cbCategorie.setValue(produit.getCategorie());
+        txtPrix.setText(String.valueOf(produit.getPrix()));
+        txtDescription.setText(produit.getDescription());
+        txtImagePath.setText(produit.getImagePath());
+        chkDisponible.setSelected(produit.getDisponible() != null && produit.getDisponible());
+
+        Produit complet = produitDAO.getProduitAvecIngredients(produit.getId());
+        if (complet != null && complet.getIngredients() != null) {
+            for (ProduitIngredient pi : complet.getIngredients()) {
+                if (pi.getIngredient() != null) {
+                    ingredientList.add(new IngredientPanier(pi.getIngredient(), pi.getQuantite()));
+                }
+            }
+        }
     }
 
     private void setupTableIngredients() {
@@ -239,16 +264,29 @@ public class ProductDialog extends Stage {
         }
         try {
             double prix = Double.parseDouble(prixStr);
-            Produit p = new Produit(0, nom, prix, cat, desc, img);
-            p.setDisponible(disponible);
 
-            for (IngredientPanier ip : ingredientList) {
-                ProduitIngredient pi = new ProduitIngredient(p, ip.stock, ip.quantite);
-                p.getIngredients().add(pi);
+            if (editingProduit != null) {
+                editingProduit.setNom(nom);
+                editingProduit.setPrix(prix);
+                editingProduit.setCategorie(cat);
+                editingProduit.setDescription(desc);
+                editingProduit.setImagePath(img);
+                editingProduit.setDisponible(disponible);
+                editingProduit.getIngredients().clear();
+                for (IngredientPanier ip : ingredientList) {
+                    editingProduit.getIngredients().add(new ProduitIngredient(editingProduit, ip.stock, ip.quantite));
+                }
+                produitDAO.modifierProduit(editingProduit);
+                new Alert(Alert.AlertType.INFORMATION, "Produit modifié avec succès !", ButtonType.OK).showAndWait();
+            } else {
+                Produit p = new Produit(0, nom, prix, cat, desc, img);
+                p.setDisponible(disponible);
+                for (IngredientPanier ip : ingredientList) {
+                    p.getIngredients().add(new ProduitIngredient(p, ip.stock, ip.quantite));
+                }
+                produitDAO.ajouterProduit(p);
+                new Alert(Alert.AlertType.INFORMATION, "Produit ajouté avec succès !", ButtonType.OK).showAndWait();
             }
-
-            produitDAO.ajouterProduit(p);
-            new Alert(Alert.AlertType.INFORMATION, "Produit ajouté avec succès !", ButtonType.OK).showAndWait();
             close();
         } catch (NumberFormatException ex) {
             new Alert(Alert.AlertType.ERROR, "Le prix doit être un nombre valide.", ButtonType.OK).showAndWait();
