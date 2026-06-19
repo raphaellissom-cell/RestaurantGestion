@@ -147,7 +147,7 @@ class EncaissementFlowTest {
         assertTrue(nom.endsWith(".txt"), "Le fichier doit être un .txt");
 
         String content = CommandeDAO.lireFactureTXT(idCommande);
-        assertTrue(content.contains("L'ÉLIXIR GOURMAND"), "Doit contenir l'en-tête");
+        assertTrue(content.contains("monRestau"), "Doit contenir l'en-tête");
         assertTrue(content.contains("32000.00 FCFA"), "Doit contenir le total");
         assertTrue(content.contains("Carte Bancaire") || content.contains("N° Commande"), "Doit contenir les infos");
     }

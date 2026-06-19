@@ -111,7 +111,7 @@ public class CommandeDAO {
             double totalApresRemise = sousTotal - remise;
 
             sb.append(sep).append("\n");
-            sb.append("         L'ÉLIXIR GOURMAND\n");
+            sb.append("          monRestau\n");
             sb.append("       RESTAURANT GASTRONOMIQUE\n");
             sb.append(sep).append("\n");
             sb.append("N° Commande  : #").append(commande.getId()).append("\n");
@@ -150,7 +150,7 @@ public class CommandeDAO {
 
             sb.append(sep).append("\n");
             sb.append("     Merci de votre visite !\n");
-            sb.append("  À bientôt chez L'Élixir Gourmand\n");
+            sb.append("       À bientôt chez monRestau\n");
             sb.append(sep).append("\n");
 
         } catch (Exception e) {

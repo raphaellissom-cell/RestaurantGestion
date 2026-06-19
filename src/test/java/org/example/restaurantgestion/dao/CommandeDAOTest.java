@@ -84,7 +84,7 @@ class CommandeDAOTest {
         assertTrue(nom.endsWith(".txt"), "Le fichier doit être un .txt");
 
         String content = CommandeDAO.lireFactureTXT(c.getIdCommande());
-        assertTrue(content.contains("L'ÉLIXIR GOURMAND"), "Le contenu doit contenir l'en-tête");
+        assertTrue(content.contains("monRestau"), "Le contenu doit contenir l'en-tête");
         assertTrue(content.contains("FCFA"), "Le contenu doit mentionner FCFA");
     }
 }
