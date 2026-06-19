@@ -1,5 +1,5 @@
 -- =============================================================
---  SEED : Données de démonstration cohérentes — monRestau
+--  SEED : Données de démonstration cohérentes — L'ÉLIXIR GOURMAND
 --  Vérifié : chaque total de commande = somme de ses lignes
 --            chaque statut de table correspond à ses commandes
 -- =============================================================

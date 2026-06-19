@@ -19,7 +19,7 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(mainView, bounds.getWidth(), bounds.getHeight());
         scene.setFill(Color.web("#F9FAFB"));
 
-        stage.setTitle("monRestau");
+        stage.setTitle("L'ÉLIXIR GOURMAND");
         stage.setMinWidth(1180);
         stage.setMinHeight(720);
         stage.setX(bounds.getMinX());

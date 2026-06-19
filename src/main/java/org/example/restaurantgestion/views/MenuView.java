@@ -267,6 +267,15 @@ public class MenuView extends VBox {
         Label lblPrix = new Label(String.format("Prix : %.2f FCFA", produitComplet.getPrix()));
         lblPrix.setStyle("-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: #F07C33; -fx-padding: 4px 0;");
 
+        Boolean dispo = produitComplet.getDisponible();
+        Label lblDispo = new Label(dispo != null && dispo ? "✓ Disponible" : "✗ Indisponible");
+        lblDispo.setStyle(
+            "-fx-font-size: 12px; -fx-font-weight: 700; -fx-padding: 4px 10px; -fx-background-radius: 12px;" +
+            (dispo != null && dispo
+                ? "-fx-text-fill: #059669; -fx-background-color: #05966915;"
+                : "-fx-text-fill: #DC2626; -fx-background-color: #DC262615;")
+        );
+
         Separator separator = new Separator();
 
         Label lblDescTitle = new Label("Description :");
@@ -280,7 +289,7 @@ public class MenuView extends VBox {
         lblDesc.setWrapText(true);
         lblDesc.setMaxWidth(350);
 
-        infoBox.getChildren().addAll(lblNom, lblCat, lblPrix, separator, lblDescTitle, lblDesc);
+        infoBox.getChildren().addAll(lblNom, lblCat, lblPrix, lblDispo, separator, lblDescTitle, lblDesc);
 
         if (produitComplet.getIngredients() != null && !produitComplet.getIngredients().isEmpty()) {
             Separator sep2 = new Separator();

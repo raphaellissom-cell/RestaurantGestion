@@ -78,7 +78,7 @@ public class ProductDialog extends Stage {
         Label lblDesc = new Label("Description");
         lblDesc.setStyle("-fx-font-weight: bold;");
         grid.add(lblDesc, 0, 3);
-        txtDescription.setPromptText("Description textuelle du produit...");
+        txtDescription.setPromptText("Description du plat (préparation, goût, présentation...) ex : Saumon sauvage, avocat, citronnelle");
         txtDescription.setPrefRowCount(4);
         txtDescription.setPrefWidth(300);
         txtDescription.setPrefHeight(80);

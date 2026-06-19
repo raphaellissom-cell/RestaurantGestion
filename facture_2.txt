@@ -1,6 +1,6 @@
 =========================================
-          monRestau
-       RESTAURANT GASTRONOMIQUE
+      L'ÉLIXIR GOURMAND
+     RESTAURANT GASTRONOMIQUE
 =========================================
 N° Commande  : #2
 Date         : 19/06/2026 14:53
@@ -17,5 +17,5 @@ Sous-total                 :     98.00 FCFA
 TOTAL                      :     98.00 FCFA
 =========================================
      Merci de votre visite !
-       À bientôt chez monRestau
+    À bientôt chez L'ÉLIXIR GOURMAND
 =========================================

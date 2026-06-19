@@ -33,7 +33,7 @@ public class HeaderView extends HBox {
             SidebarView.SVG_DIR + "logo.svg", "header-logo-icon", 28
         );
 
-        Label lblTitle = new Label("monRestau");
+        Label lblTitle = new Label("L'ÉLIXIR GOURMAND");
         lblTitle.getStyleClass().add("header-title");
 
         Label lblBadge = new Label("CONSOLE");
