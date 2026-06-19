@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
+    <persistence-unit name="restaurantPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>org.example.restaurantgestion.models.Commande</class>
+        <class>org.example.restaurantgestion.models.Facture</class>
+        <class>org.example.restaurantgestion.models.LigneCommande</class>
+        <class>org.example.restaurantgestion.models.Paiement</class>
+        <class>org.example.restaurantgestion.models.Produit</class>
+        <class>org.example.restaurantgestion.models.Stock</class>
+        <class>org.example.restaurantgestion.models.TableRestaurant</class>
+        <properties>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5433/gestion_restaurant"/>
+            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
+            <property name="jakarta.persistence.jdbc.password" value="12345678t9"/>
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>

@@ -1,0 +1,1120 @@
+/* ============================================================
+   RESTAURANT GESTION — Design System (Thème Light, accent Orange)
+   ============================================================ */
+
+/* --- RACINE & TYPOGRAPHIE --- */
+.root {
+    -fx-background-color: #F3F4F6;
+    -fx-font-family: 'DejaVu Sans', 'Segoe UI', Arial, sans-serif;
+    -fx-text-fill: #1F2937;
+}
+
+/* --- SCROLLPANE : fond transparent pour ne pas casser le layout --- */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+.scroll-pane .corner {
+    -fx-background-color: transparent;
+}
+/* ScrollPane à l'intérieur de la sidebar : transparent */
+.sidebar-view .scroll-pane,
+.sidebar-view .scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* --- EN-TÊTE (HEADER) SOLID --- */
+.header-view {
+    -fx-background-color: #FFFFFF;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 12, 0, 0, 2);
+    -fx-border-color: transparent transparent #E5E7EB transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 0 36px 0 36px;
+    -fx-min-height: 68px;
+    -fx-max-height: 68px;
+    -fx-pref-height: 68px;
+}
+
+.header-logo-icon {
+    -fx-fill: #F07C33;
+}
+
+.header-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+    -fx-font-family: 'DejaVu Sans', 'Segoe UI', Arial, sans-serif;
+    -fx-text-fill: #111827;
+    -fx-letter-spacing: 0.5px;
+}
+
+.header-badge {
+    -fx-font-size: 9px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #F07C33;
+    -fx-background-color: rgba(240, 124, 51, 0.1);
+    -fx-padding: 3px 10px 3px 10px;
+    -fx-background-radius: 20px;
+    -fx-border-color: rgba(240, 124, 51, 0.25);
+    -fx-border-radius: 20px;
+    -fx-border-width: 1px;
+}
+
+.header-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 16px;
+    -fx-padding: 0;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-max-width: 38px;
+    -fx-max-height: 38px;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.header-btn:hover {
+    -fx-background-color: #F3F4F6;
+    -fx-text-fill: #111827;
+}
+
+.header-btn:pressed {
+    -fx-background-color: #E5E7EB;
+}
+
+.header-btn-refresh:hover {
+    -fx-text-fill: #F07C33;
+}
+
+.header-btn-notif {
+    -fx-text-fill: #6B7280;
+}
+
+.header-btn-notif:hover {
+    -fx-text-fill: #F07C33;
+}
+
+/* --- Profil utilisateur --- */
+.header-profile-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-radius: 30px;
+    -fx-background-radius: 30px;
+    -fx-border-width: 1.5px;
+    -fx-padding: 5px 16px 5px 5px;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+    -fx-spacing: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 6, 0, 0, 1);
+}
+
+.header-profile-box:hover {
+    -fx-background-color: #F9FAFB;
+    -fx-border-color: #F07C33;
+    -fx-effect: dropshadow(three-pass-box, rgba(240, 124, 51, 0.12), 8, 0, 0, 2);
+}
+
+.header-avatar-svg {
+    -fx-fill: #6B7280;
+}
+
+.header-profile-box:hover .header-avatar-svg {
+    -fx-fill: #F07C33;
+}
+
+.header-profile-name {
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+}
+
+.header-profile-arrow {
+    -fx-font-size: 9px;
+    -fx-text-fill: #9CA3AF;
+}
+
+.header-notif-badge {
+    -fx-background-color: #EF4444;
+    -fx-min-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+    -fx-background-radius: 4px;
+}
+
+/* --- BARRE LATÉRALE (SIDEBAR) CLAIRE TYPE INTERFACE.PNG --- */
+.sidebar-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent #E5E7EB transparent transparent;
+    -fx-border-width: 0 1px 0 0;
+    -fx-padding: 0;
+    -fx-pref-width: 80px;
+    -fx-min-width: 80px;
+    -fx-max-width: 80px;
+}
+
+.sidebar-brand-container {
+    -fx-background-color: #F07C33;
+    -fx-alignment: center;
+    -fx-min-height: 72px;
+    -fx-max-height: 72px;
+    -fx-pref-height: 72px;
+    -fx-cursor: hand;
+}
+
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 10px;
+    -fx-font-weight: 600;
+    -fx-padding: 12px 2px 12px 2px;
+    -fx-background-radius: 0px;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-pref-width: 80px;
+    -fx-min-width: 80px;
+    -fx-max-width: 80px;
+    -fx-pref-height: 72px;
+    -fx-min-height: 72px;
+    -fx-max-height: 72px;
+    -fx-border-color: transparent transparent #F3F4F6 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: #F9FAFB;
+    -fx-text-fill: #111827;
+}
+
+.sidebar-btn-active {
+    -fx-background-color: rgba(240, 124, 51, 0.08); /* Orange très doux */
+    -fx-text-fill: #F07C33; /* Orange de la marque */
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+    -fx-padding: 12px 2px 12px 2px;
+    -fx-background-radius: 0px;
+    -fx-cursor: default;
+    -fx-alignment: center;
+    -fx-pref-width: 80px;
+    -fx-min-width: 80px;
+    -fx-max-width: 80px;
+    -fx-pref-height: 72px;
+    -fx-min-height: 72px;
+    -fx-max-height: 72px;
+    -fx-border-color: transparent transparent #F3F4F6 #F07C33;
+    -fx-border-width: 0 0 1px 4px;
+}
+
+/* --- SVG ICON FILL --- */
+.svg-icon {
+    -fx-fill: #6B7280;
+}
+
+.sidebar-btn:hover .svg-icon {
+    -fx-fill: #111827;
+}
+
+.sidebar-btn-active .svg-icon {
+    -fx-fill: #F07C33;
+}
+
+.sidebar-brand-container .svg-icon {
+    -fx-fill: #FFFFFF;
+}
+
+/* --- ZONE DE CONTENU CENTRAL --- */
+.content-view {
+    -fx-padding: 28px;
+    -fx-background-color: #F9FAFB;
+}
+
+.section-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #111827;
+    -fx-padding: 0 0 12px 0;
+}
+
+
+.form-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D5DB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 28px;
+}
+
+.text-field, .text-area, .combo-box-base {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #C7CBD1;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused, .text-area:focused, .combo-box-base:focused {
+    -fx-border-color: #F07C33;
+    -fx-border-width: 1px;
+}
+
+
+.table-management-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D1D5DB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 18px;
+}
+
+.section-subtitle {
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #111827;
+}
+
+.table-selection-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6B7280;
+}
+
+.table-card-selected {
+    -fx-border-color: #F07C33;
+    -fx-border-width: 2px;
+}
+
+.table-card .button-primary, .table-card .button-secondary {
+    -fx-padding: 7px 12px 7px 12px;
+    -fx-font-size: 11px;
+}
+
+/* --- CARTES KPI (DASHBOARD) --- */
+.kpi-card {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 20px;
+
+}
+
+.kpi-title {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6B7280;
+    -fx-font-weight: 700;
+}
+
+.kpi-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #111827;
+    -fx-padding: 4px 0 0 0;
+}
+
+.kpi-accent-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #F07C33;
+    -fx-padding: 4px 0 0 0;
+}
+
+/* --- CARTES DE TABLE (PLAN DE SALLE) --- */
+.table-card {
+    -fx-background-color: #FFFFFF;
+    -fx-border-width: 1.5px;
+    -fx-border-color: #E5E7EB;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 20px 16px 16px 16px;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 6, 0, 0, 2);
+}
+
+.table-card:hover {
+    -fx-border-color: #F07C33;
+    -fx-effect: dropshadow(three-pass-box, rgba(240, 124, 51, 0.12), 10, 0, 0, 4);
+}
+
+.table-card-free {
+    -fx-border-color: rgba(16, 185, 129, 0.5);
+}
+
+.table-card-free:hover {
+    -fx-border-color: #10B981;
+}
+
+.table-card-busy {
+    -fx-border-color: rgba(239, 68, 68, 0.5);
+}
+
+.table-card-busy:hover {
+    -fx-border-color: #EF4444;
+}
+
+.table-card-reserved {
+    -fx-border-color: rgba(245, 158, 11, 0.5);
+}
+
+.table-card-reserved:hover {
+    -fx-border-color: #F59E0B;
+}
+
+.table-card-selected {
+    -fx-border-width: 2px;
+    -fx-border-color: #F07C33;
+    -fx-effect: dropshadow(three-pass-box, rgba(240, 124, 51, 0.2), 12, 0, 0, 4);
+}
+
+.table-card-free.table-card-selected {
+    -fx-border-color: #10B981;
+}
+
+.table-card-busy.table-card-selected {
+    -fx-border-color: #EF4444;
+}
+
+.table-card-reserved.table-card-selected {
+    -fx-border-color: #F59E0B;
+}
+
+.table-num {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #111827;
+}
+
+.table-info {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #6B7280;
+}
+
+.table-status {
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-padding: 3px 12px 3px 12px;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-letter-spacing: 0.5px;
+}
+
+.table-status-free {
+    -fx-background-color: rgba(16, 185, 129, 0.1);
+    -fx-text-fill: #059669;
+    -fx-border-color: rgba(16, 185, 129, 0.2);
+}
+
+.table-status-busy {
+    -fx-background-color: rgba(239, 68, 68, 0.1);
+    -fx-text-fill: #DC2626;
+    -fx-border-color: rgba(239, 68, 68, 0.2);
+}
+
+.table-status-reserved {
+    -fx-background-color: rgba(245, 158, 11, 0.1);
+    -fx-text-fill: #D97706;
+    -fx-border-color: rgba(245, 158, 11, 0.2);
+}
+
+.table-card .erp-action-btn {
+    -fx-font-size: 10px;
+    -fx-padding: 4px 10px;
+    -fx-min-height: 26px;
+}
+
+/* --- BOUTONS STANDARDS --- */
+.button-primary {
+    -fx-background-color: #F07C33;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 10px 20px 10px 20px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+
+}
+
+.button-primary:hover {
+    -fx-background-color: #E26922;
+}
+
+.button-primary:pressed {
+    -fx-background-color: #C85D1A;
+}
+
+.button-secondary {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #374151;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 10px 20px 10px 20px;
+    -fx-background-radius: 6px;
+    -fx-border-color: #D1D5DB;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+
+.button-secondary:hover {
+    -fx-background-color: #F9FAFB;
+    -fx-border-color: #9CA3AF;
+}
+
+/* --- TABLEVIEW --- */
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #F9FAFB;
+    -fx-background-radius: 6px 6px 0 0;
+    -fx-border-color: transparent transparent #E5E7EB transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6B7280;
+    -fx-font-weight: 700;
+    -fx-font-size: 11px;
+    -fx-size: 36px;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #6B7280;
+    -fx-font-weight: 700;
+    -fx-font-size: 11px;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1F2937;
+    -fx-border-color: transparent transparent #F3F4F6 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #FAFAFA;
+}
+
+.table-view .table-row-cell:filled:hover {
+    -fx-background-color: #FFF7F0;
+}
+
+.table-view .table-row-cell:filled:selected {
+    -fx-background-color: rgba(240, 124, 51, 0.1);
+    -fx-text-fill: #1F2937;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #1F2937;
+    -fx-font-size: 13px;
+    -fx-padding: 10px 12px 10px 12px;
+    -fx-border-color: transparent;
+}
+
+/* Supprime le focus bleu par défaut sur les cellules */
+.table-view:focused .table-row-cell:filled:selected {
+    -fx-background-color: rgba(240, 124, 51, 0.12);
+    -fx-text-fill: #1F2937;
+}
+
+/* --- CHAMPS DE SAISIE --- */
+.text-field {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1F2937;
+    -fx-border-color: #D1D5DB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 9px 12px 9px 12px;
+    -fx-prompt-text-fill: #9CA3AF;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused {
+    -fx-border-color: #F07C33;
+    -fx-background-color: #FFFFFF;
+}
+
+/* --- TEXTAREA --- */
+.text-area {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1F2937;
+    -fx-border-color: #D1D5DB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-prompt-text-fill: #9CA3AF;
+    -fx-font-size: 13px;
+}
+
+.text-area:focused {
+    -fx-border-color: #F07C33;
+}
+
+.text-area .content {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 6px;
+}
+
+/* --- COMBOBOX --- */
+.combo-box {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1F2937;
+    -fx-border-color: #D1D5DB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.combo-box:focused {
+    -fx-border-color: #F07C33;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #1F2937;
+    -fx-background-color: transparent;
+    -fx-padding: 5px 10px;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 8, 0, 0, 4);
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #FFF7F0;
+    -fx-text-fill: #F07C33;
+}
+
+/* --- RADIO BUTTONS --- */
+.radio-button {
+    -fx-text-fill: #374151;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.radio-button:selected {
+    -fx-text-fill: #111827;
+}
+
+.radio-button .radio {
+    -fx-border-color: #D1D5DB;
+}
+
+.radio-button:selected .radio {
+    -fx-border-color: #F07C33;
+}
+
+.radio-button:selected .dot {
+    -fx-background-color: #F07C33;
+}
+
+/* --- PANNEAU CAISSE (PAIEMENTS - fond BLANC) --- */
+.order-cart-panel {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 24px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 8, 0, 0, 2);
+}
+
+/* Textes dans le panneau caisse - forcer couleur sombre sur fond blanc */
+.order-cart-panel .label {
+    -fx-text-fill: #374151;
+}
+
+/* --- CARTES PRODUITS (CATALOGUE) --- */
+.product-card {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.03), 6, 0, 0, 1);
+}
+
+.product-card:hover {
+    -fx-background-color: #FFF7F0;
+    -fx-border-color: #F07C33;
+}
+
+.product-name {
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+    -fx-font-size: 13px;
+}
+
+.product-price {
+    -fx-text-fill: #F07C33;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+}
+
+.product-category {
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 11px;
+}
+
+/* --- HYPERLINK --- */
+.hyperlink {
+    -fx-text-fill: #F07C33;
+    -fx-underline: false;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-border-color: transparent;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: #E26922;
+    -fx-underline: true;
+}
+
+/* --- BADGES ÉTAT STOCK (couleurs lisibles sur fond blanc) --- */
+.stock-ok {
+    -fx-text-fill: #059669;
+    -fx-font-weight: 700;
+}
+
+.stock-low {
+    -fx-text-fill: #D97706;
+    -fx-font-weight: 700;
+}
+
+.stock-critical {
+    -fx-text-fill: #DC2626;
+    -fx-font-weight: 700;
+}
+
+/* --- GRAPHIQUES (Charts) --- */
+.chart {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 16px;
+}
+
+.chart-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+}
+
+.chart-plot-background {
+    -fx-background-color: #FFFFFF;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.default-color0.chart-bar {
+    -fx-bar-fill: #F07C33;
+}
+.default-color1.chart-bar {
+    -fx-bar-fill: #FBA36C;
+}
+
+/* --- BOUTONS DE FILTRE DANS LES CARTES --- */
+.filter-btn {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #4B5563;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 20px;
+    -fx-border-color: #E5E7EB;
+    -fx-border-radius: 20px;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+
+.filter-btn:hover {
+    -fx-background-color: #F9FAFB;
+    -fx-text-fill: #1F2937;
+    -fx-border-color: #D1D5DB;
+}
+
+.filter-btn:selected {
+    -fx-background-color: #F07C33;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #F07C33;
+    -fx-effect: dropshadow(three-pass-box, rgba(240, 124, 51, 0.25), 6, 0, 0, 2);
+}
+
+/* --- CARTES DU MENU RE-DESIGNED --- */
+.menu-card {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.02), 8, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+.menu-card:hover {
+    -fx-border-color: #F07C33;
+    -fx-effect: dropshadow(three-pass-box, rgba(240, 124, 51, 0.1), 12, 0, 0, 4);
+}
+
+.menu-card-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1F2937;
+}
+
+.menu-card-price {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #F07C33;
+}
+
+/* --- VUES TABLEAU (ERP / SAGE STYLE) --- */
+
+/* Conteneur principal des pages de gestion */
+.erp-page {
+    -fx-spacing: 0;
+    -fx-padding: 0;
+    -fx-background-color: #F3F4F6;
+}
+
+/* En-tête de page */
+.erp-page-header {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #E5E7EB transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 16px 28px 16px 28px;
+    -fx-alignment: center-left;
+    -fx-spacing: 16;
+}
+
+.erp-page-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #111827;
+}
+
+/* Barre d'outils filtre */
+.erp-toolbar {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #E5E7EB transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 10px 28px 10px 28px;
+    -fx-alignment: center-left;
+    -fx-spacing: 8;
+}
+
+.erp-filter-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-padding: 6px 14px;
+    -fx-background-radius: 4px;
+    -fx-border-color: #E5E7EB;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+
+.erp-filter-btn:hover {
+    -fx-background-color: #F3F4F6;
+    -fx-text-fill: #1F2937;
+}
+
+.erp-filter-btn:selected {
+    -fx-background-color: #F07C33;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #F07C33;
+}
+
+/* Corps de page : contient le tableau */
+.erp-body {
+    -fx-padding: 20px 28px 28px 28px;
+    -fx-spacing: 0;
+    -fx-background-color: #F3F4F6;
+}
+
+/* Style tableau dense (ERP) */
+.erp-table {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-padding: 0;
+}
+
+.erp-table .column-header-background {
+    -fx-background-color: #F9FAFB;
+    -fx-border-color: transparent transparent #E5E7EB transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.erp-table .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 10px;
+    -fx-border-color: transparent #F3F4F6 transparent transparent;
+    -fx-border-width: 0 1px 0 0;
+    -fx-size: 34px;
+}
+
+.erp-table .column-header .label {
+    -fx-text-fill: #6B7280;
+    -fx-font-weight: 700;
+    -fx-font-size: 11px;
+    -fx-text-transform: uppercase;
+}
+
+.erp-table .table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #F3F4F6 transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-cell-size: 38px;
+}
+
+.erp-table .table-row-cell:odd {
+    -fx-background-color: #FAFAFA;
+}
+
+.erp-table .table-row-cell:filled:hover {
+    -fx-background-color: #FFF7F0;
+}
+
+.erp-table .table-row-cell:filled:selected {
+    -fx-background-color: rgba(240, 124, 51, 0.1);
+}
+
+.erp-table .table-cell {
+    -fx-text-fill: #1F2937;
+    -fx-font-size: 12px;
+    -fx-padding: 6px 10px;
+    -fx-border-color: transparent;
+    -fx-alignment: center-left;
+}
+
+.erp-table .table-cell:last-column {
+    -fx-alignment: center;
+}
+
+/* Badge de catégorie / statut dans les tableaux */
+.erp-badge {
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-padding: 2px 10px;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+}
+
+.erp-badge-entree {
+    -fx-text-fill: #059669;
+    -fx-background-color: rgba(5, 150, 105, 0.1);
+    -fx-border-color: rgba(5, 150, 105, 0.2);
+}
+
+.erp-badge-plat {
+    -fx-text-fill: #2563EB;
+    -fx-background-color: rgba(37, 99, 235, 0.1);
+    -fx-border-color: rgba(37, 99, 235, 0.2);
+}
+
+.erp-badge-dessert {
+    -fx-text-fill: #DB2777;
+    -fx-background-color: rgba(219, 39, 119, 0.1);
+    -fx-border-color: rgba(219, 39, 119, 0.2);
+}
+
+.erp-badge-boisson {
+    -fx-text-fill: #D97706;
+    -fx-background-color: rgba(217, 119, 6, 0.1);
+    -fx-border-color: rgba(217, 119, 6, 0.2);
+}
+
+.erp-badge-encours {
+    -fx-text-fill: #D97706;
+    -fx-background-color: rgba(245, 158, 11, 0.12);
+    -fx-border-color: rgba(245, 158, 11, 0.2);
+}
+
+.erp-badge-paye {
+    -fx-text-fill: #059669;
+    -fx-background-color: rgba(16, 185, 129, 0.1);
+    -fx-border-color: rgba(16, 185, 129, 0.2);
+}
+
+.erp-badge-pret {
+    -fx-text-fill: #2563EB;
+    -fx-background-color: rgba(37, 99, 235, 0.1);
+    -fx-border-color: rgba(37, 99, 235, 0.2);
+}
+
+/* Prix dans les tableaux */
+.erp-price {
+    -fx-font-weight: 700;
+    -fx-text-fill: #111827;
+}
+
+/* Boutons d'action compacts dans les tableaux */
+.erp-action-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-padding: 4px 10px;
+    -fx-background-radius: 4px;
+    -fx-border-color: #E5E7EB;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+    -fx-min-height: 26px;
+}
+
+.erp-action-btn:hover {
+    -fx-background-color: #F3F4F6;
+    -fx-text-fill: #1F2937;
+}
+
+.erp-action-btn-primary {
+    -fx-background-color: #F07C33;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #F07C33;
+}
+
+.erp-action-btn-primary:hover {
+    -fx-background-color: #E26922;
+}
+
+.erp-action-btn-success {
+    -fx-background-color: #059669;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #059669;
+}
+
+.erp-action-btn-success:hover {
+    -fx-background-color: #047857;
+}
+
+.erp-action-btn-danger {
+    -fx-text-fill: #DC2626;
+    -fx-border-color: rgba(220, 38, 38, 0.2);
+}
+
+.erp-action-btn-danger:hover {
+    -fx-background-color: rgba(220, 38, 38, 0.08);
+}
+
+/* Message "aucune donnée" */
+.erp-empty {
+    -fx-font-size: 14px;
+    -fx-text-fill: #9CA3AF;
+    -fx-font-weight: 600;
+    -fx-padding: 40px 0;
+    -fx-alignment: center;
+}
+
+/* --- DASHBOARD ERP --- */
+.dashboard-kpi {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 16px 20px 18px 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 6, 0, 0, 2);
+    -fx-min-height: 90px;
+}
+
+.dashboard-kpi-title {
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #6B7280;
+    -fx-letter-spacing: 0.3px;
+}
+
+.dashboard-kpi-value {
+    -fx-padding: 2px 0 0 0;
+}
+
+.dashboard-section {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E5E7EB;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 16px 16px 12px 16px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 6, 0, 0, 2);
+}
+
+.dashboard-section-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #6B7280;
+    -fx-letter-spacing: 0.5px;
+}
+
+.dashboard-chart {
+    -fx-background-color: transparent;
+    -fx-padding: 4px;
+}
+
+.dashboard-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.dashboard-chart .chart-vertical-grid-lines {
+    -fx-stroke: #F3F4F6;
+}
+
+.dashboard-chart .chart-horizontal-grid-lines {
+    -fx-stroke: #F3F4F6;
+}
+
+.dashboard-chart .axis-label {
+    -fx-font-size: 10px;
+    -fx-text-fill: #9CA3AF;
+}
+
+.dashboard-chart .axis {
+    -fx-tick-label-font-size: 9px;
+    -fx-tick-label-fill: #9CA3AF;
+}
+
+.dashboard-chart .chart-bar {
+    -fx-bar-fill: #F07C33;
+}
+
+.dashboard-refresh-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9CA3AF;
+    -fx-font-weight: 500;
+}

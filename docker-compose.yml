@@ -1,0 +1,54 @@
+# docker-compose file without version (Docker Compose v2 syntax)
+
+services:
+
+  # ─────────────────────────────────────────────
+  #  Base de données PostgreSQL
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: restaurant_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gestion_restaurant
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345678t9
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gestion_restaurant"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - restaurant_net
+
+  # ─────────────────────────────────────────────
+  #  pgAdmin — Interface web d'administration BDD
+  #  Accessible sur http://localhost:5050
+  # ─────────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: restaurant_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@restaurant.fr
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - restaurant_net
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  restaurant_net:
+    driver: bridge
