@@ -1,7 +1,6 @@
 module org.example.restaurantgestion {
     requires java.xml;
     requires javafx.controls;
-    requires itextpdf;
     requires jakarta.persistence;
     requires org.hibernate.orm.core;
     requires static lombok;

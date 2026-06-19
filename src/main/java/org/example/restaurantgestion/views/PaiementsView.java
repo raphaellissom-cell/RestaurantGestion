@@ -217,7 +217,18 @@ public class PaiementsView extends VBox {
             new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner une commande pour imprimer la facture !", ButtonType.OK).showAndWait();
             return;
         }
-        commandeDAO.genererFacturePDF(activeCommande);
-        new Alert(Alert.AlertType.INFORMATION, "Facture PDF générée à la racine de l'application !", ButtonType.OK).showAndWait();
+        CommandeDAO.genererFactureTXT(activeCommande);
+        String content = CommandeDAO.lireFactureTXT(activeCommande.getIdCommande());
+
+        TextArea area = new TextArea(content);
+        area.setEditable(false);
+        area.setPrefSize(480, 360);
+        area.setStyle("-fx-font-family: monospace; -fx-font-size: 13px; -fx-padding: 16px;");
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Facture — Commande #" + activeCommande.getIdCommande());
+        dialog.getDialogPane().setContent(area);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.showAndWait();
     }
 }

@@ -187,8 +187,7 @@ public class DashboardView extends VBox {
         LocalDate today = LocalDate.now();
         for (Commande cmd : commandes) {
             if (cmd.getDateCommande().toLocalDate().equals(today)
-                && ("Payée".equalsIgnoreCase(cmd.getStatut()) || "Payé".equalsIgnoreCase(cmd.getStatut())
-                    || "En attente".equalsIgnoreCase(cmd.getStatut()))) {
+                && "Payée".equalsIgnoreCase(cmd.getStatut())) {
                 caJour += cmd.getTotal();
             }
             if ("En cours".equalsIgnoreCase(cmd.getStatut())) {
@@ -207,7 +206,7 @@ public class DashboardView extends VBox {
         for (int i = 6; i >= 0; i--) caParJour.put(today.minusDays(i), 0.0);
         for (Commande cmd : commandes) {
             LocalDate d = cmd.getDateCommande().toLocalDate();
-            if (caParJour.containsKey(d) && ("Payée".equalsIgnoreCase(cmd.getStatut()) || "Payé".equalsIgnoreCase(cmd.getStatut()))) {
+            if (caParJour.containsKey(d) && "Payée".equalsIgnoreCase(cmd.getStatut())) {
                 caParJour.put(d, caParJour.get(d) + cmd.getTotal());
             }
         }

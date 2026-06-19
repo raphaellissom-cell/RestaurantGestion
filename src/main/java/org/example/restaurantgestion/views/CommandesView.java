@@ -9,6 +9,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.example.restaurantgestion.dao.CommandeDAO;
+import org.example.restaurantgestion.dao.FactureDAO;
+import org.example.restaurantgestion.dao.PaiementDAO;
 import org.example.restaurantgestion.models.Commande;
 
 import java.time.format.DateTimeFormatter;
@@ -50,7 +52,7 @@ public class CommandesView extends VBox {
 
         ajouterFiltre(toolbar, "Toutes", "Tout");
         ajouterFiltre(toolbar, "En cours", "En cours");
-        ajouterFiltre(toolbar, "Payées", "Payé");
+        ajouterFiltre(toolbar, "Payées", "Payée");
 
         // --- CORPS : TABLEAU ---
         VBox body = new VBox();
@@ -144,31 +146,52 @@ public class CommandesView extends VBox {
         });
 
         TableColumn<Commande, Void> colActions = new TableColumn<>("");
-        colActions.setPrefWidth(140);
+        colActions.setPrefWidth(180);
         colActions.setCellFactory(col -> new TableCell<>() {
-            private final Button btnPdf = new Button("PDF");
+            private final Button btnVoir = new Button("Voir");
             private final Button btnPay = new Button("Encaisser");
             private final Label lblPaye = new Label("Payée");
             private final HBox box = new HBox(6);
 
             {
                 box.setAlignment(Pos.CENTER);
-                btnPdf.getStyleClass().addAll("erp-action-btn");
+                btnVoir.getStyleClass().addAll("erp-action-btn");
                 btnPay.getStyleClass().addAll("erp-action-btn", "erp-action-btn-success");
                 lblPaye.getStyleClass().addAll("erp-badge", "erp-badge-paye");
                 lblPaye.setStyle("-fx-font-size: 11px; -fx-padding: 4px 10px;");
 
-                btnPdf.setOnAction(e -> {
+                btnVoir.setOnAction(e -> {
                     Commande c = getTableView().getItems().get(getIndex());
-                    commandeDAO.genererFacturePDF(c);
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                        "Facture générée (facture_" + c.getIdCommande() + ".pdf)", ButtonType.OK);
-                    alert.showAndWait();
+                    CommandeDAO.genererFactureTXT(c);
+                    String content = CommandeDAO.lireFactureTXT(c.getIdCommande());
+
+                    TextArea area = new TextArea(content);
+                    area.setEditable(false);
+                    area.setPrefSize(480, 360);
+                    area.setStyle("-fx-font-family: monospace; -fx-font-size: 13px; -fx-padding: 16px;");
+
+                    Dialog<ButtonType> dialog = new Dialog<>();
+                    dialog.setTitle("Facture — Commande #" + c.getIdCommande());
+                    dialog.getDialogPane().setContent(area);
+                    dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+                    dialog.showAndWait();
                 });
 
                 btnPay.setOnAction(e -> {
                     Commande c = getTableView().getItems().get(getIndex());
-                    commandeDAO.mettreAJourStatut(c.getIdCommande(), "Payé");
+
+                    EncaisseDialog dialog = new EncaisseDialog(c);
+                    dialog.showAndWait();
+                    if (!dialog.estValide()) return;
+
+                    new PaiementDAO().enregistrerPaiement(c.getIdCommande(), dialog.getModePaiement(), dialog.getMontantRecu());
+                    new FactureDAO().creerFacture(c.getIdCommande(), c.getTotal());
+                    CommandeDAO.genererFactureTXT(c);
+
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                        "Commande #" + c.getIdCommande() + " payée — " + String.format("%,.0f", c.getTotal()) + " FCFA",
+                        ButtonType.OK);
+                    alert.showAndWait();
                     chargerDonnees();
                 });
             }
@@ -179,8 +202,8 @@ public class CommandesView extends VBox {
                 if (empty) { setGraphic(null); return; }
                 Commande c = getTableView().getItems().get(getIndex());
                 box.getChildren().clear();
-                box.getChildren().add(btnPdf);
-                if (c != null && !"Payé".equalsIgnoreCase(c.getStatut())) {
+                box.getChildren().add(btnVoir);
+                if (c != null && !"Payée".equalsIgnoreCase(c.getStatut())) {
                     box.getChildren().add(btnPay);
                 } else {
                     box.getChildren().add(lblPaye);

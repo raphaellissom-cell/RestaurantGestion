@@ -1,16 +1,14 @@
 package org.example.restaurantgestion.dao;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import org.example.restaurantgestion.models.Commande;
 import org.example.restaurantgestion.models.TableRestaurant;
 import org.example.restaurantgestion.util.HibernateUtil;
 
-import java.io.FileOutputStream;
+import java.io.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,29 +65,39 @@ public class CommandeDAO {
         }
     }
 
-    public void genererFacturePDF(Commande commande) {
-        Document document = new Document();
-        try {
-            String nomFichier = "facture_" + commande.getId() + ".pdf";
-            PdfWriter.getInstance(document, new FileOutputStream(nomFichier));
+    public static String genererFactureTXT(Commande commande) {
+        String nomFichier = "facture_" + commande.getId() + ".txt";
+        String sep = "=========================================";
+        String content = sep + "\n"
+            + "           FACTURE RESTAURANT\n"
+            + sep + "\n"
+            + "N° Commande : " + commande.getId() + "\n"
+            + "Date        : " + commande.getDateCommande().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n"
+            + "Table       : " + (commande.getTable() != null ? commande.getTable().getNumeroTable() : "À emporter") + "\n"
+            + "-----------------------------------------\n"
+            + "TOTAL       : " + String.format("%,.0f", commande.getTotal()) + " FCFA\n"
+            + sep + "\n"
+            + "Merci de votre visite et à bientôt !\n";
+        try (PrintWriter w = new PrintWriter(new FileWriter(nomFichier))) {
+            w.print(content);
+            System.out.println("Facture TXT générée : " + nomFichier);
+        } catch (IOException e) {
+            System.err.println("Erreur écriture facture TXT : " + e.getMessage());
+        }
+        return nomFichier;
+    }
 
-            document.open();
-            document.add(new Paragraph("========================================="));
-            document.add(new Paragraph("           FACTURE RESTAURANT            "));
-            document.add(new Paragraph("========================================="));
-            document.add(new Paragraph("Numéro de Commande : " + commande.getId()));
-            document.add(new Paragraph("Date : " + commande.getDateCommande()));
-            document.add(new Paragraph("Table concernée : " + commande.getIdTable()));
-            document.add(new Paragraph("-----------------------------------------"));
-            document.add(new Paragraph("TOTAL À PAYER : " + commande.getTotal() + " FCFA"));
-            document.add(new Paragraph("========================================="));
-            document.add(new Paragraph("Merci de votre visite et à bientôt !"));
-
-            System.out.println("PDF facture généré : " + nomFichier);
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la génération du PDF : " + e.getMessage());
-        } finally {
-            document.close();
+    public static String lireFactureTXT(int idCommande) {
+        String nomFichier = "facture_" + idCommande + ".txt";
+        try (BufferedReader r = new BufferedReader(new FileReader(nomFichier))) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = r.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            return "Facture introuvable : " + nomFichier;
         }
     }
 

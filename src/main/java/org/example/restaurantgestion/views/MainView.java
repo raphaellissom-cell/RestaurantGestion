@@ -98,6 +98,7 @@ public class MainView extends BorderPane {
             case "Dashboard":  return new DashboardView(this);
             case "Menus":      return new MenuView();
             case "Commandes":  return new CommandesView();
+            case "Factures":   return new FacturesView();
             case "Tables":     return new TablesView(this);
             case "Paiements":  return new PaiementsView();
             case "Stocks":     return new StocksView();

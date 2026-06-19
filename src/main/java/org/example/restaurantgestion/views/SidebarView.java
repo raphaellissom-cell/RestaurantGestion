@@ -84,6 +84,7 @@ public class SidebarView extends VBox {
         addNavButton(navBox, "menu.svg",     "Menus",      "Menus");
         addNavButton(navBox, "table.svg",    "Tables",     "Tables");
         addNavButton(navBox, "commande.svg", "Commandes",  "Commandes");
+        addNavButton(navBox, "facture.svg",  "Factures",   "Factures");
 
         ScrollPane scrollPane = new ScrollPane(navBox);
         scrollPane.setFitToWidth(true);
