@@ -1,5 +1,6 @@
 package org.example.restaurantgestion.views;
 
+import javafx.animation.RotateTransition;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -8,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 import org.example.restaurantgestion.dao.CommandeDAO;
 import org.example.restaurantgestion.dao.FactureDAO;
 import org.example.restaurantgestion.dao.PaiementDAO;
@@ -44,7 +46,22 @@ public class CommandesView extends VBox {
             chargerDonnees();
         });
 
-        header.getChildren().addAll(lblTitle, spacer, btnNew);
+        Label arrowIcon = new Label("↻");
+        arrowIcon.getStyleClass().add("refresh-icon");
+
+        Button btnRefresh = new Button();
+        btnRefresh.setGraphic(arrowIcon);
+        btnRefresh.getStyleClass().add("button-refresh");
+        btnRefresh.setOnAction(e -> {
+            RotateTransition spin = new RotateTransition(Duration.millis(400), arrowIcon);
+            spin.setFromAngle(0);
+            spin.setToAngle(360);
+            spin.setCycleCount(1);
+            spin.play();
+            spin.setOnFinished(ev -> chargerDonnees());
+        });
+
+        header.getChildren().addAll(lblTitle, spacer, btnRefresh, btnNew);
 
         // --- TOOLBAR / FILTRES ---
         HBox toolbar = new HBox();

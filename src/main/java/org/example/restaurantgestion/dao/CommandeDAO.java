@@ -117,7 +117,7 @@ public class CommandeDAO {
             if (lignes.isEmpty()) {
                 sousTotal = commande.getTotal();
             }
-            double remise = commande.getRemise();
+            double remise = commande.getRemise() != null ? commande.getRemise() : 0.0;
             double totalApresRemise = sousTotal - remise;
 
             sb.append(sep).append("\n");

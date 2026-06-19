@@ -49,7 +49,7 @@ public class Commande {
     private String statut;
 
     @Column(name = "remise")
-    private double remise;
+    private Double remise = 0.0;
 
     @Column
     private String notes;

@@ -473,6 +473,23 @@
     -fx-border-color: #9CA3AF;
 }
 
+.button-refresh {
+    -fx-background-color: transparent;
+    -fx-border-color: #D1D5DB;
+    -fx-border-radius: 6px;
+    -fx-padding: 6px 10px;
+    -fx-cursor: hand;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+}
+.button-refresh:hover {
+    -fx-background-color: #F3F4F6;
+}
+.refresh-icon {
+    -fx-font-size: 18px;
+    -fx-text-fill: #4B5563;
+}
+
 /* --- TABLEVIEW --- */
 .table-view {
     -fx-background-color: #FFFFFF;
