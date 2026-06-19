@@ -1,5 +1,7 @@
 package org.example.restaurantgestion.views;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Tuple;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -8,6 +10,12 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.example.restaurantgestion.util.HibernateUtil;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.*;
 
 public class VentesView extends VBox {
 
@@ -22,7 +30,6 @@ public class VentesView extends VBox {
         HBox chartsLayout = new HBox(20);
         HBox.setHgrow(chartsLayout, Priority.ALWAYS);
 
-        // 1. BarChart : Ventes de la semaine
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Jour");
         NumberAxis yAxis = new NumberAxis();
@@ -34,30 +41,80 @@ public class VentesView extends VBox {
         barChart.setPrefWidth(400);
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.getData().add(new XYChart.Data<>("Lun", 420));
-        series.getData().add(new XYChart.Data<>("Mar", 510));
-        series.getData().add(new XYChart.Data<>("Mer", 600));
-        series.getData().add(new XYChart.Data<>("Jeu", 490));
-        series.getData().add(new XYChart.Data<>("Ven", 850));
-        series.getData().add(new XYChart.Data<>("Sam", 1200));
-        series.getData().add(new XYChart.Data<>("Dim", 950));
-
+        chargerDonneesCA(series);
         barChart.getData().add(series);
 
-        // 2. PieChart : Répartition par catégories
-        ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList(
-                        new PieChart.Data("Entrées", 15),
-                        new PieChart.Data("Plats", 55),
-                        new PieChart.Data("Desserts", 18),
-                        new PieChart.Data("Boissons", 12));
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        chargerDonneesCategories(pieChartData);
 
         PieChart pieChart = new PieChart(pieChartData);
-        pieChart.setTitle("Répartition des Ventes");
+        pieChart.setTitle("Répartition des Ventes par Catégorie");
         pieChart.setLabelsVisible(true);
         pieChart.setPrefWidth(350);
 
         chartsLayout.getChildren().addAll(barChart, pieChart);
         this.getChildren().addAll(title, chartsLayout);
+    }
+
+    private void chargerDonneesCA(XYChart.Series<String, Number> series) {
+        EntityManager em = HibernateUtil.getEntityManager();
+        try {
+            List<Tuple> resultats = em.createQuery(
+                    "SELECT FUNCTION('DATE', c.dateCommande) AS jour, SUM(c.total) AS ca " +
+                    "FROM Commande c WHERE c.statut = 'Payée' " +
+                    "GROUP BY FUNCTION('DATE', c.dateCommande) " +
+                    "ORDER BY FUNCTION('DATE', c.dateCommande) DESC", Tuple.class)
+                    .setMaxResults(7)
+                    .getResultList();
+
+            Map<LocalDate, Double> caParJour = new TreeMap<>();
+            LocalDate today = LocalDate.now();
+            for (int i = 6; i >= 0; i--) caParJour.put(today.minusDays(i), 0.0);
+
+            for (Tuple t : resultats) {
+                LocalDate jour = t.get(0, LocalDate.class);
+                Double ca = t.get(1, Double.class);
+                if (jour != null && ca != null) caParJour.put(jour, ca);
+            }
+
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM");
+            for (Map.Entry<LocalDate, Double> e : caParJour.entrySet()) {
+                series.getData().add(new XYChart.Data<>(e.getKey().format(fmt), e.getValue()));
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur chargement données CA : " + e.getMessage());
+            series.getData().add(new XYChart.Data<>("Aucune", 0));
+        } finally {
+            em.close();
+        }
+    }
+
+    private void chargerDonneesCategories(ObservableList<PieChart.Data> pieData) {
+        EntityManager em = HibernateUtil.getEntityManager();
+        try {
+            List<Tuple> resultats = em.createQuery(
+                    "SELECT p.categorie, SUM(lc.quantite) AS total " +
+                    "FROM LigneCommande lc JOIN lc.produit p JOIN lc.commande c " +
+                    "WHERE c.statut = 'Payée' " +
+                    "GROUP BY p.categorie " +
+                    "ORDER BY total DESC", Tuple.class)
+                    .getResultList();
+
+            if (resultats.isEmpty()) {
+                pieData.add(new PieChart.Data("Aucune vente", 1));
+                return;
+            }
+
+            for (Tuple t : resultats) {
+                String cat = t.get(0, String.class);
+                Number total = t.get(1, Number.class);
+                pieData.add(new PieChart.Data(cat != null ? cat : "Autre", total != null ? total.doubleValue() : 0));
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur chargement catégories : " + e.getMessage());
+            pieData.add(new PieChart.Data("Aucune donnée", 1));
+        } finally {
+            em.close();
+        }
     }
 }

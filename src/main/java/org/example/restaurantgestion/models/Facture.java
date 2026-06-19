@@ -36,6 +36,15 @@ public class Facture {
     @Column(name = "date_generation", nullable = false)
     private LocalDateTime dateGeneration = LocalDateTime.now();
 
+    @Column(name = "numero_facture")
+    private String numeroFacture;
+
+    @Column(name = "mode_paiement")
+    private String modePaiement;
+
+    @Column(name = "chemin_pdf")
+    private String cheminPdf;
+
     public Facture(Commande commande, double total) {
         this.commande = commande;
         this.total = total;

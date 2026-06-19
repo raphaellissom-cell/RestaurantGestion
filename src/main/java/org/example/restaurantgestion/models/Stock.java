@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "stocks")
 @Getter
@@ -29,4 +31,10 @@ public class Stock {
 
     @Column(name = "seuil_alerte", nullable = false)
     private double seuilAlerte;
+
+    @Column(name = "unite")
+    private String unite;
+
+    @Column(name = "last_updated")
+    private LocalDateTime lastUpdated;
 }

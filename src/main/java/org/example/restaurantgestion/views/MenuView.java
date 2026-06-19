@@ -186,9 +186,15 @@ public class MenuView extends VBox {
     }
 
     private void afficherDetailsProduit(Produit produit) {
+        Produit produitComplet = produitDAO.getProduitAvecIngredients(produit.getId());
+        if (produitComplet == null) {
+            new Alert(Alert.AlertType.ERROR, "Impossible de charger les détails du produit.", ButtonType.OK).showAndWait();
+            return;
+        }
+
         Stage detailsStage = new Stage();
         detailsStage.initModality(Modality.APPLICATION_MODAL);
-        detailsStage.setTitle("Détails - " + produit.getNom());
+        detailsStage.setTitle("Détails - " + produitComplet.getNom());
         detailsStage.setResizable(false);
 
         VBox layout = new VBox(20);
@@ -203,7 +209,7 @@ public class MenuView extends VBox {
 
         String catColor = "#6B7280";
         String catEmoji = "🍽️";
-        switch (produit.getCategorie()) {
+        switch (produitComplet.getCategorie()) {
             case "Entrée" -> { catColor = "#10B981"; catEmoji = "🥗"; }
             case "Plat" -> { catColor = "#3B82F6"; catEmoji = "🍝"; }
             case "Dessert" -> { catColor = "#EC4899"; catEmoji = "🍰"; }
@@ -219,8 +225,8 @@ public class MenuView extends VBox {
         );
 
         boolean hasImage = false;
-        if (produit.getImagePath() != null && !produit.getImagePath().trim().isEmpty()) {
-            String path = produit.getImagePath().trim();
+        if (produitComplet.getImagePath() != null && !produitComplet.getImagePath().trim().isEmpty()) {
+            String path = produitComplet.getImagePath().trim();
             if (path.length() <= 2) {
                 Label lblBigEmoji = new Label(path);
                 lblBigEmoji.setStyle("-fx-font-size: 72px;");
@@ -248,33 +254,55 @@ public class MenuView extends VBox {
         VBox infoBox = new VBox(8);
         infoBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label lblNom = new Label(produit.getNom());
+        Label lblNom = new Label(produitComplet.getNom());
         lblNom.setStyle("-fx-font-size: 20px; -fx-font-weight: 800; -fx-text-fill: #1F2937;");
         lblNom.setWrapText(true);
 
-        Label lblCat = new Label(produit.getCategorie().toUpperCase());
+        Label lblCat = new Label(produitComplet.getCategorie().toUpperCase());
         lblCat.setStyle(
             "-fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: " + catColor + "; " +
             "-fx-background-color: " + catColor + "15; -fx-padding: 4px 10px; -fx-background-radius: 12px;"
         );
 
-        Label lblPrix = new Label(String.format("Prix : %.2f FCFA", produit.getPrix()));
+        Label lblPrix = new Label(String.format("Prix : %.2f FCFA", produitComplet.getPrix()));
         lblPrix.setStyle("-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: #F07C33; -fx-padding: 4px 0;");
 
         Separator separator = new Separator();
 
-        Label lblDescTitle = new Label("Description / Ingrédients :");
+        Label lblDescTitle = new Label("Description :");
         lblDescTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: #4B5563;");
 
-        String descriptionText = (produit.getDescription() == null || produit.getDescription().trim().isEmpty())
+        String descriptionText = (produitComplet.getDescription() == null || produitComplet.getDescription().trim().isEmpty())
                 ? "Aucune description fournie pour ce produit."
-                : produit.getDescription();
+                : produitComplet.getDescription();
         Label lblDesc = new Label(descriptionText);
         lblDesc.setStyle("-fx-font-size: 13px; -fx-text-fill: #4B5563; -fx-line-spacing: 1.4;");
         lblDesc.setWrapText(true);
         lblDesc.setMaxWidth(350);
 
         infoBox.getChildren().addAll(lblNom, lblCat, lblPrix, separator, lblDescTitle, lblDesc);
+
+        if (produitComplet.getIngredients() != null && !produitComplet.getIngredients().isEmpty()) {
+            Separator sep2 = new Separator();
+            Label lblIngTitle = new Label("Ingrédients :");
+            lblIngTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: #4B5563;");
+
+            VBox ingBox = new VBox(4);
+            for (var pi : produitComplet.getIngredients()) {
+                String nomIng = pi.getIngredient() != null ? pi.getIngredient().getNomIngredient() : "?";
+                String unite = pi.getIngredient() != null && pi.getIngredient().getUnite() != null ? pi.getIngredient().getUnite() : "";
+                HBox row = new HBox(8);
+                row.setAlignment(Pos.CENTER_LEFT);
+                Label bullet = new Label("•");
+                bullet.setStyle("-fx-font-size: 14px; -fx-text-fill: #F07C33; -fx-font-weight: 700;");
+                Label ingLabel = new Label(nomIng + " : " + pi.getQuantite() + " " + unite);
+                ingLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #4B5563;");
+                row.getChildren().addAll(bullet, ingLabel);
+                ingBox.getChildren().add(row);
+            }
+
+            infoBox.getChildren().addAll(sep2, lblIngTitle, ingBox);
+        }
 
         Button btnClose = new Button("Fermer");
         btnClose.getStyleClass().add("button-secondary");
@@ -283,7 +311,7 @@ public class MenuView extends VBox {
 
         layout.getChildren().addAll(mediaContainer, infoBox, btnClose);
 
-        Scene scene = new Scene(layout, 400, 500);
+        Scene scene = new Scene(layout, 420, 550);
         scene.getStylesheets().add(
             getClass().getResource("/org/example/restaurantgestion/css/style.css").toExternalForm()
         );

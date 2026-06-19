@@ -80,11 +80,14 @@ public class SidebarView extends VBox {
         navBox.setMinWidth(80);
         navBox.setMaxWidth(80);
 
-        addNavButton(navBox, "logo.svg",     "Dashboard",  "Dashboard");
-        addNavButton(navBox, "menu.svg",     "Menus",      "Menus");
-        addNavButton(navBox, "table.svg",    "Tables",     "Tables");
-        addNavButton(navBox, "commande.svg", "Commandes",  "Commandes");
-        addNavButton(navBox, "facture.svg",  "Factures",   "Factures");
+        addNavButton(navBox, "logo.svg",      "Dashboard",  "Dashboard");
+        addNavButton(navBox, "menu.svg",      "Menus",      "Menus");
+        addNavButton(navBox, "table.svg",     "Tables",     "Tables");
+        addNavButton(navBox, "commande.svg",  "Commandes",  "Commandes");
+        addNavButton(navBox, "facture.svg",   "Factures",   "Factures");
+        addNavButton(navBox, "paiements.svg", "Paiements",  "Paiements");
+        addNavButton(navBox, "stocks.svg",    "Stocks",     "Stocks");
+        addNavButton(navBox, "ventes.svg",    "Ventes",     "Ventes");
 
         ScrollPane scrollPane = new ScrollPane(navBox);
         scrollPane.setFitToWidth(true);

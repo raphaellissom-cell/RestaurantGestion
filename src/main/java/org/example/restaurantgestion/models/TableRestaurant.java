@@ -33,4 +33,7 @@ public class TableRestaurant {
 
     @Column(nullable = false)
     private String statut;
+
+    @Column
+    private String localisation;
 }

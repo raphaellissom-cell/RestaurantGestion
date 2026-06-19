@@ -1,13 +1,18 @@
 package org.example.restaurantgestion.views;
 
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.util.StringConverter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.example.restaurantgestion.dao.CommandeDAO;
 import org.example.restaurantgestion.dao.LigneCommandeDAO;
 import org.example.restaurantgestion.dao.ProduitDAO;
@@ -32,12 +37,18 @@ public class CommandeDialog extends Stage {
     private final RadioButton rbTakeAway = new RadioButton("A emporter");
     private final ComboBox<TableRestaurant> cbTable = new ComboBox<>();
     private final TextField txtTime = new TextField();
+
     private final ComboBox<String> cbCategory = new ComboBox<>();
     private final ComboBox<Produit> cbItemName = new ComboBox<>();
-    private final TextArea txtNotes = new TextArea();
     private final TextField txtQuantity = new TextField("1");
-    private final TextField txtUnitPrice = new TextField();
+
+    private final TableView<PanierItem> panierTable = new TableView<>();
+    private final ObservableList<PanierItem> panier = FXCollections.observableArrayList();
+    private final Label lblTotalPanier = new Label("0.00 FCFA");
+
     private final ComboBox<String> cbAttendant = new ComboBox<>();
+    private final TextField txtRemise = new TextField();
+    private final TextArea txtNotes = new TextArea();
 
     public CommandeDialog() {
         initModality(Modality.APPLICATION_MODAL);
@@ -46,22 +57,21 @@ public class CommandeDialog extends Stage {
         root.setPadding(new Insets(16, 28, 28, 28));
         root.setStyle("-fx-background-color: #F9FAFB;");
 
-        // Header
         Label lblHeaderSub = new Label("Restaurants");
         lblHeaderSub.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280; -fx-font-weight: 500;");
         Label lblHeaderTitle = new Label("Nouvelle Commande");
         lblHeaderTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: 800; -fx-text-fill: #111827; -fx-padding: 2px 0 14px 0;");
 
-        // Order type row
         HBox rowOrderType = new HBox(50);
         rowOrderType.setAlignment(Pos.CENTER_LEFT);
         Label lblOrderType = createRowLabel("Type de commande *");
         rbDineIn.setToggleGroup(orderTypeGroup);
         rbDineIn.setSelected(true);
         rbTakeAway.setToggleGroup(orderTypeGroup);
+        rbTakeAway.setOnAction(e -> cbTable.setDisable(true));
+        rbDineIn.setOnAction(e -> cbTable.setDisable(false));
         rowOrderType.getChildren().addAll(lblOrderType, rbDineIn, rbTakeAway);
 
-        // Table row
         HBox rowTable = new HBox(50);
         rowTable.setAlignment(Pos.CENTER_LEFT);
         Label lblTable = createRowLabel("Table *");
@@ -77,7 +87,6 @@ public class CommandeDialog extends Stage {
         });
         rowTable.getChildren().addAll(lblTable, cbTable);
 
-        // Time row (read‑only)
         HBox rowTime = new HBox(50);
         rowTime.setAlignment(Pos.CENTER_LEFT);
         Label lblTime = createRowLabel("Heure");
@@ -86,47 +95,47 @@ public class CommandeDialog extends Stage {
         txtTime.setText(nowText());
         rowTime.getChildren().addAll(lblTime, txtTime);
 
-        // Items section
         VBox sectionItems = new VBox(8);
         Label lblItemsTitle = new Label("Articles de commande *");
         lblItemsTitle.setStyle("-fx-font-weight: 800; -fx-text-fill: #374151;");
-        GridPane headerGrid = createItemGrid();
-        headerGrid.setStyle("-fx-background-color: #F3F4F6; -fx-border-color: #D1D5DB; -fx-border-width: 1px 1px 0 1px; -fx-padding: 10px;");
-        headerGrid.add(createColHeader("Catégorie"), 0, 0);
-        headerGrid.add(createColHeader("* Nom de l'article"), 1, 0);
-        headerGrid.add(createColHeader("Notes"), 2, 0);
-        headerGrid.add(createColHeader("* Quantité"), 3, 0);
-        headerGrid.add(createColHeader("Prix unitaire"), 4, 0);
-        GridPane fieldsGrid = createItemGrid();
-        fieldsGrid.setHgap(10);
-        fieldsGrid.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #D1D5DB; -fx-border-width: 1px; -fx-padding: 10px;");
-        cbCategory.setPrefWidth(170);
+
+        HBox addRow = new HBox(10);
+        addRow.setAlignment(Pos.CENTER_LEFT);
+        cbCategory.setPrefWidth(150);
         cbCategory.valueProperty().addListener((obs, oldV, newV) -> filtrerProduitsParCategorie(newV));
-        txtUnitPrice.setPrefWidth(110);
-        txtUnitPrice.setEditable(false);
-        cbItemName.setPrefWidth(210);
+        cbItemName.setPrefWidth(200);
         cbItemName.setConverter(new StringConverter<>() {
             @Override
-            public String toString(Produit produit) { return produit == null ? "" : produit.getNom(); }
+            public String toString(Produit produit) { return produit == null ? "" : produit.getNom() + " - " + String.format("%.0f", produit.getPrix()) + " FCFA"; }
             @Override
             public Produit fromString(String value) { return null; }
         });
-        cbItemName.valueProperty().addListener((obs, oldV, prod) -> txtUnitPrice.setText(prod == null ? "" : String.format("%.2f", prod.getPrix())));
-        txtNotes.setPrefWidth(190);
-        txtNotes.setPrefHeight(58);
-        txtNotes.setPromptText("Optionnel");
-        txtQuantity.setPrefWidth(100);
-        fieldsGrid.add(cbCategory, 0, 0);
-        fieldsGrid.add(cbItemName, 1, 0);
-        fieldsGrid.add(txtNotes, 2, 0);
-        fieldsGrid.add(txtQuantity, 3, 0);
-        fieldsGrid.add(txtUnitPrice, 4, 0);
-        Hyperlink lnkAddNew = new Hyperlink("+ Ajouter");
-        lnkAddNew.setStyle("-fx-text-fill: #F07C33; -fx-font-weight: bold; -fx-font-size: 13px; -fx-underline: false;");
-        lnkAddNew.setOnAction(e -> new Alert(Alert.AlertType.INFORMATION, "L'ajout de plusieurs lignes sera branche à l'étape panier.", ButtonType.OK).showAndWait());
-        sectionItems.getChildren().addAll(lblItemsTitle, headerGrid, fieldsGrid, lnkAddNew);
+        txtQuantity.setPrefWidth(80);
+        txtQuantity.setPromptText("Qté");
+        Button btnAjouter = new Button("+ Ajouter");
+        btnAjouter.getStyleClass().add("button-primary");
+        btnAjouter.setOnAction(e -> ajouterAuPanier());
+        addRow.getChildren().addAll(cbCategory, cbItemName, txtQuantity, btnAjouter);
 
-        // Attendant row
+        setupPanierTable();
+
+        HBox panierTotal = new HBox(10);
+        panierTotal.setAlignment(Pos.CENTER_RIGHT);
+        panierTotal.setPadding(new Insets(8, 0, 0, 0));
+        Label lblTotalLabel = new Label("Total :");
+        lblTotalLabel.setStyle("-fx-font-weight: 700; -fx-font-size: 16px; -fx-text-fill: #374151;");
+        lblTotalPanier.setStyle("-fx-font-weight: 800; -fx-font-size: 18px; -fx-text-fill: #F07C33;");
+        panierTotal.getChildren().addAll(lblTotalLabel, lblTotalPanier);
+
+        sectionItems.getChildren().addAll(lblItemsTitle, addRow, panierTable, panierTotal);
+
+        HBox rowRemise = new HBox(50);
+        rowRemise.setAlignment(Pos.CENTER_LEFT);
+        Label lblRemise = createRowLabel("Remise (FCFA)");
+        txtRemise.setPromptText("0");
+        txtRemise.setPrefWidth(260);
+        rowRemise.getChildren().addAll(lblRemise, txtRemise);
+
         HBox rowAttendant = new HBox(50);
         rowAttendant.setAlignment(Pos.CENTER_LEFT);
         Label lblAttendant = createRowLabel("Attendant *");
@@ -135,30 +144,121 @@ public class CommandeDialog extends Stage {
         cbAttendant.setPrefWidth(260);
         rowAttendant.getChildren().addAll(lblAttendant, cbAttendant);
 
-        // Action buttons
+        HBox rowNotes = new HBox(50);
+        rowNotes.setAlignment(Pos.CENTER_LEFT);
+        Label lblNotes = createRowLabel("Notes");
+        txtNotes.setPromptText("Notes sur la commande...");
+        txtNotes.setPrefWidth(260);
+        txtNotes.setPrefRowCount(2);
+        rowNotes.getChildren().addAll(lblNotes, txtNotes);
+
         HBox rowActions = new HBox(12);
         rowActions.setAlignment(Pos.CENTER_LEFT);
         rowActions.setPadding(new Insets(8, 0, 0, 0));
-        Button btnSubmit = new Button("Enregistrer");
+        Button btnSubmit = new Button("Enregistrer la commande");
         btnSubmit.getStyleClass().add("button-primary");
-        btnSubmit.setOnAction(e -> { enregistrerCommande(); });
+        btnSubmit.setOnAction(e -> enregistrerCommande());
         Button btnCancel = new Button("Annuler");
         btnCancel.getStyleClass().add("button-secondary");
         btnCancel.setOnAction(e -> close());
         rowActions.getChildren().addAll(btnSubmit, btnCancel);
 
-        // Assemble root
-        root.getChildren().addAll(lblHeaderSub, lblHeaderTitle, rowOrderType, rowTable, rowTime, sectionItems, rowAttendant, rowActions);
+        root.getChildren().addAll(lblHeaderSub, lblHeaderTitle, rowOrderType, rowTable, rowTime, sectionItems, rowRemise, rowAttendant, rowNotes, rowActions);
         initialiseDonnees();
-        Scene scene = new Scene(root, 900, 560);
-setScene(scene);
-setWidth(900);
-setHeight(560);
-setMinWidth(900);
-setMinHeight(560);
-setResizable(false);
-sizeToScene();
-setAlwaysOnTop(true);
+
+        Scene scene = new Scene(root, 850, 700);
+        scene.getStylesheets().add(
+            getClass().getResource("/org/example/restaurantgestion/css/style.css").toExternalForm()
+        );
+        setScene(scene);
+        setWidth(850);
+        setHeight(620);
+        setMinWidth(850);
+        setMinHeight(620);
+        setResizable(true);
+        sizeToScene();
+        setAlwaysOnTop(true);
+    }
+
+    private void setupPanierTable() {
+        panierTable.getStyleClass().add("erp-table");
+        panierTable.setPrefHeight(180);
+        panierTable.setItems(panier);
+
+        TableColumn<PanierItem, String> colProd = new TableColumn<>("Produit");
+        colProd.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().produit.getNom()));
+        colProd.setPrefWidth(200);
+
+        TableColumn<PanierItem, Number> colQte = new TableColumn<>("Qté");
+        colQte.setCellValueFactory(cd -> new SimpleIntegerProperty(cd.getValue().quantite));
+        colQte.setPrefWidth(80);
+
+        TableColumn<PanierItem, Number> colPU = new TableColumn<>("Prix unitaire");
+        colPU.setCellValueFactory(cd -> new SimpleDoubleProperty(cd.getValue().produit.getPrix()));
+        colPU.setPrefWidth(120);
+        colPU.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Number item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : String.format("%,.0f FCFA", item.doubleValue()));
+            }
+        });
+
+        TableColumn<PanierItem, Number> colST = new TableColumn<>("Sous-total");
+        colST.setCellValueFactory(cd -> new SimpleDoubleProperty(cd.getValue().getSousTotal()));
+        colST.setPrefWidth(120);
+        colST.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Number item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : String.format("%,.0f FCFA", item.doubleValue()));
+            }
+        });
+
+        TableColumn<PanierItem, Void> colAction = new TableColumn<>("");
+        colAction.setPrefWidth(60);
+        colAction.setCellFactory(col -> new TableCell<>() {
+            private final Button btn = new Button("✕");
+            {
+                btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #EF4444; -fx-font-weight: bold; -fx-cursor: hand;");
+                btn.setOnAction(e -> {
+                    PanierItem item = getTableView().getItems().get(getIndex());
+                    panier.remove(item);
+                    mettreAJourTotal();
+                });
+            }
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : btn);
+            }
+        });
+
+        panierTable.getColumns().addAll(colProd, colQte, colPU, colST, colAction);
+    }
+
+    private void ajouterAuPanier() {
+        Produit produit = cbItemName.getValue();
+        if (produit == null) {
+            new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner un produit.", ButtonType.OK).showAndWait();
+            return;
+        }
+        int quantite;
+        try {
+            quantite = Integer.parseInt(txtQuantity.getText().trim());
+            if (quantite <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException ex) {
+            new Alert(Alert.AlertType.ERROR, "La quantité doit être un entier positif.", ButtonType.OK).showAndWait();
+            return;
+        }
+        panier.add(new PanierItem(produit, quantite));
+        mettreAJourTotal();
+        txtQuantity.setText("1");
+    }
+
+    private void mettreAJourTotal() {
+        double total = panier.stream().mapToDouble(PanierItem::getSousTotal).sum();
+        lblTotalPanier.setText(String.format("%,.0f FCFA", total));
     }
 
     private void initialiseDonnees() {
@@ -184,24 +284,46 @@ setAlwaysOnTop(true);
     }
 
     private void enregistrerCommande() {
+        if (panier.isEmpty()) {
+            new Alert(Alert.AlertType.WARNING, "Ajoutez au moins un article à la commande.", ButtonType.OK).showAndWait();
+            return;
+        }
+
+        boolean isDineIn = rbDineIn.isSelected();
         TableRestaurant table = cbTable.getValue();
-        Produit produit = cbItemName.getValue();
-        if (table == null || produit == null) {
-            new Alert(Alert.AlertType.WARNING, "Veuillez choisir une table et un produit.", ButtonType.OK).showAndWait();
+        if (isDineIn && table == null) {
+            new Alert(Alert.AlertType.WARNING, "Veuillez choisir une table.", ButtonType.OK).showAndWait();
             return;
         }
-        int quantite;
+
+        double remise = 0;
         try {
-            quantite = Integer.parseInt(txtQuantity.getText().trim());
-            if (quantite <= 0) throw new NumberFormatException();
+            String remiseStr = txtRemise.getText().trim();
+            if (!remiseStr.isEmpty()) {
+                remise = Double.parseDouble(remiseStr);
+                if (remise < 0) throw new NumberFormatException();
+            }
         } catch (NumberFormatException ex) {
-            new Alert(Alert.AlertType.ERROR, "La quantité doit être un entier positif.", ButtonType.OK).showAndWait();
+            new Alert(Alert.AlertType.ERROR, "La remise doit être un nombre valide et positif.", ButtonType.OK).showAndWait();
             return;
         }
+
+        String serveur = cbAttendant.getValue();
+        String notes = txtNotes.getText().trim();
+
         try {
-            int idCommande = commandeDAO.creerCommande(table.getId());
-            ligneCommandeDAO.ajouterLigneCommande(idCommande, produit.getId(), quantite);
-            new Alert(Alert.AlertType.INFORMATION, "Commande n°" + idCommande + " enregistrée avec succès.", ButtonType.OK).showAndWait();
+            int idCommande;
+            if (isDineIn) {
+                idCommande = commandeDAO.creerCommande(table.getId(), serveur, notes, remise);
+            } else {
+                idCommande = commandeDAO.creerCommande(0, serveur, notes, remise);
+            }
+
+            for (PanierItem item : panier) {
+                ligneCommandeDAO.ajouterLigneCommande(idCommande, item.produit.getId(), item.quantite);
+            }
+
+            new Alert(Alert.AlertType.INFORMATION, "Commande n°" + idCommande + " enregistrée avec succès (" + panier.size() + " article(s)).", ButtonType.OK).showAndWait();
             close();
         } catch (Exception ex) {
             new Alert(Alert.AlertType.ERROR, "Impossible d'enregistrer la commande : " + ex.getMessage(), ButtonType.OK).showAndWait();
@@ -214,25 +336,21 @@ setAlwaysOnTop(true);
         return label;
     }
 
-    private GridPane createItemGrid() {
-        GridPane grid = new GridPane();
-        grid.getColumnConstraints().addAll(
-                new ColumnConstraints(180),
-                new ColumnConstraints(180),
-                new ColumnConstraints(180),
-                new ColumnConstraints(120),
-                new ColumnConstraints(120)
-        );
-        return grid;
-    }
-
-    private Label createColHeader(String text) {
-        Label lbl = new Label(text);
-        lbl.setStyle("-fx-font-weight: 800; -fx-text-fill: #374151; -fx-font-size: 12px;");
-        return lbl;
-    }
-
     private String nowText() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+    }
+
+    private static class PanierItem {
+        private final Produit produit;
+        private final int quantite;
+
+        PanierItem(Produit produit, int quantite) {
+            this.produit = produit;
+            this.quantite = quantite;
+        }
+
+        double getSousTotal() {
+            return produit.getPrix() * quantite;
+        }
     }
 }

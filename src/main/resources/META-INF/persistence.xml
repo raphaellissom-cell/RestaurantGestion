@@ -9,6 +9,7 @@
         <class>org.example.restaurantgestion.models.Produit</class>
         <class>org.example.restaurantgestion.models.Stock</class>
         <class>org.example.restaurantgestion.models.TableRestaurant</class>
+        <class>org.example.restaurantgestion.models.ProduitIngredient</class>
         <properties>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5433/gestion_restaurant"/>
             <property name="jakarta.persistence.jdbc.user" value="postgres"/>

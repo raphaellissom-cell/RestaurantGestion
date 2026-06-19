@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import org.example.restaurantgestion.dao.CommandeDAO;
+import org.example.restaurantgestion.dao.IngredientDAO;
 import org.example.restaurantgestion.dao.TableDAO;
 import org.example.restaurantgestion.models.Commande;
 import org.example.restaurantgestion.models.TableRestaurant;
@@ -24,6 +25,7 @@ public class DashboardView extends VBox {
     private final MainView mainView;
     private final TableDAO tableDAO = new TableDAO();
     private final CommandeDAO commandeDAO = new CommandeDAO();
+    private final IngredientDAO ingredientDAO = new IngredientDAO();
 
     private final Label lblTablesLibres;
     private final Label lblChiffreAffaires;
@@ -197,7 +199,7 @@ public class DashboardView extends VBox {
         lblChiffreAffaires.setText(String.format("%,.0f FCFA", caJour));
         lblCommandesEnCours.setText(String.valueOf(enCours));
 
-        long stockAlert = 0;
+        long stockAlert = ingredientDAO.getNbAlertes();
         lblAlertesStock.setText(String.valueOf(stockAlert));
 
         // --- BAR CHART CA 7 jours ---

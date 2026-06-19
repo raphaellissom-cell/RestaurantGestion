@@ -1,132 +1,27 @@
 -- =============================================================
---  INITIALISATION DE LA BASE DE DONNÉES — L'Élixir Gourmand
---  Schéma complet : tables, contraintes, index, données initiales
--- =============================================================
-
--- Extension pour les UUIDs si besoin futur
--- CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- ─────────────────────────────────────────────────────────────
---  1. TABLES DU RESTAURANT
--- ─────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS tables_restaurant (
-    id              SERIAL PRIMARY KEY,
-    numero_table    INTEGER NOT NULL UNIQUE,
-    capacite        INTEGER NOT NULL DEFAULT 4,
-    statut          VARCHAR(20) NOT NULL DEFAULT 'Libre'
-                    CHECK (statut IN ('Libre', 'Occupée', 'Réservée')),
-    localisation    VARCHAR(50) DEFAULT 'Salle principale'
-);
-
--- ─────────────────────────────────────────────────────────────
---  2. MENU (plats, boissons, desserts)
--- ─────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS produits (
-    id_produit      SERIAL PRIMARY KEY,
-    nom             VARCHAR(100) NOT NULL,
-    prix            NUMERIC(10, 2) NOT NULL CHECK (prix >= 0),
-    categorie       VARCHAR(50) NOT NULL DEFAULT 'Plat',
-    disponible      BOOLEAN NOT NULL DEFAULT TRUE,
-    description     TEXT,
-    created_at      TIMESTAMP DEFAULT NOW()
-);
-
--- ─────────────────────────────────────────────────────────────
---  3. COMMANDES
--- ─────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS commandes (
-    id_commande     SERIAL PRIMARY KEY,
-    id_table        INTEGER REFERENCES tables_restaurant(id) ON DELETE SET NULL,
-    date_commande   TIMESTAMP NOT NULL DEFAULT NOW(),
-    statut          VARCHAR(20) NOT NULL DEFAULT 'En cours'
-                    CHECK (statut IN ('En cours', 'En attente', 'Payée', 'Annulée')),
-    total           NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
-    notes           TEXT,
-    serveur         VARCHAR(100) DEFAULT 'Non assigné'
-);
-
--- ─────────────────────────────────────────────────────────────
---  4. LIGNES DE COMMANDE
--- ─────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS lignes_commande (
-    id_ligne        SERIAL PRIMARY KEY,
-    id_commande     INTEGER NOT NULL REFERENCES commandes(id_commande) ON DELETE CASCADE,
-    id_produit      INTEGER REFERENCES produits(id_produit) ON DELETE SET NULL,
-    quantite        INTEGER NOT NULL DEFAULT 1 CHECK (quantite > 0),
-    prix_unitaire   NUMERIC(10, 2) NOT NULL,
-    sous_total      NUMERIC(10, 2) GENERATED ALWAYS AS (quantite * prix_unitaire) STORED,
-    notes           TEXT
-);
-
--- ─────────────────────────────────────────────────────────────
---  5. PAIEMENTS
--- ─────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS paiements (
-    id_paiement     SERIAL PRIMARY KEY,
-    id_commande     INTEGER NOT NULL REFERENCES commandes(id_commande) ON DELETE CASCADE,
-    mode_paiement   VARCHAR(30) NOT NULL DEFAULT 'Espèces'
-                    CHECK (mode_paiement IN ('Espèces', 'Carte Bancaire', 'Mobile Money')),
-    montant_recu    NUMERIC(10, 2) NOT NULL,
-    -- la monnaie à rendre sera calculée côté application
-    date_paiement   TIMESTAMP NOT NULL DEFAULT NOW()
-);
-
--- ─────────────────────────────────────────────────────────────
---  6. FACTURES
--- ─────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS factures (
-    id_facture      SERIAL PRIMARY KEY,
-    id_commande     INTEGER NOT NULL REFERENCES commandes(id_commande) ON DELETE CASCADE,
-    numero_facture  VARCHAR(30) NOT NULL UNIQUE DEFAULT ('FAC-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || NEXTVAL('factures_id_facture_seq')),
-    total           NUMERIC(10, 2) NOT NULL,
-    mode_paiement   VARCHAR(30),
-    date_generation TIMESTAMP NOT NULL DEFAULT NOW(),
-    chemin_pdf      VARCHAR(255)
-);
-
--- ─────────────────────────────────────────────────────────────
---  7. STOCKS (ingrédients)
--- ─────────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS stocks (
-    id_stock        SERIAL PRIMARY KEY,
-    nom_ingredient  VARCHAR(100) NOT NULL UNIQUE,
-    quantite        NUMERIC(10, 2) NOT NULL DEFAULT 0 CHECK (quantite >= 0),
-    unite           VARCHAR(20) DEFAULT 'kg',
-    seuil_alerte    NUMERIC(10, 2) NOT NULL DEFAULT 5,
-    last_updated    TIMESTAMP DEFAULT NOW()
-);
-
--- ─────────────────────────────────────────────────────────────
---  INDEX pour les performances
--- ─────────────────────────────────────────────────────────────
-CREATE INDEX IF NOT EXISTS idx_commandes_statut       ON commandes(statut);
-CREATE INDEX IF NOT EXISTS idx_commandes_date         ON commandes(date_commande);
-CREATE INDEX IF NOT EXISTS idx_lignes_commande_cmd    ON lignes_commande(id_commande);
-CREATE INDEX IF NOT EXISTS idx_produits_categorie     ON produits(categorie);
-CREATE INDEX IF NOT EXISTS idx_stocks_seuil           ON stocks(quantite, seuil_alerte);
-
--- =============================================================
---  DONNÉES INITIALES DE DÉMONSTRATION
+--  SEED : Données de démonstration cohérentes — monRestau
+--  Vérifié : chaque total de commande = somme de ses lignes
+--            chaque statut de table correspond à ses commandes
 -- =============================================================
 
 -- ─────────────────────────────────────────────────────────────
---  Tables du restaurant (10 tables)
+--  1. TABLES (10)
+--     Statut final cohérent avec les commandes ci-dessous
 -- ─────────────────────────────────────────────────────────────
 INSERT INTO tables_restaurant (numero_table, capacite, statut, localisation) VALUES
     (1,  2, 'Libre',    'Terrasse'),
     (2,  4, 'Occupée',  'Salle principale'),
     (3,  4, 'Libre',    'Salle principale'),
     (4,  6, 'Réservée', 'Salle principale'),
-    (5,  2, 'Libre',    'Terrasse'),
-    (6,  4, 'Occupée',  'Salle principale'),
-    (7,  8, 'Libre',    'Salon privé'),
+    (5,  2, 'Occupée',  'Terrasse'),
+    (6,  4, 'Libre',    'Salle principale'),
+    (7,  8, 'Occupée',  'Salon privé'),
     (8,  4, 'Libre',    'Salle principale'),
     (9,  2, 'Libre',    'Bar'),
-    (10, 6, 'Réservée', 'Salon privé')
-ON CONFLICT (numero_table) DO NOTHING;
+    (10, 6, 'Réservée', 'Salon privé');
 
 -- ─────────────────────────────────────────────────────────────
---  Carte du restaurant (produits)
+--  2. PRODUITS (24)
 -- ─────────────────────────────────────────────────────────────
 INSERT INTO produits (nom, prix, categorie, disponible, description) VALUES
     -- Entrées
@@ -135,7 +30,6 @@ INSERT INTO produits (nom, prix, categorie, disponible, description) VALUES
     ('Soupe à l''oignon',         9.50, 'Entrée',  TRUE, 'Traditionnelle, gratiné au comté'),
     ('Carpaccio de Bœuf',        13.50, 'Entrée',  TRUE, 'Roquette, parmesan, huile de truffe'),
     ('Velouté de champignons',    8.50, 'Entrée',  TRUE, 'Crème fraîche, truffes noires'),
-
     -- Plats
     ('Entrecôte Frites Maison',  26.00, 'Plat',    TRUE, '300g, sauce au poivre, frites artisanales'),
     ('Saumon Sauvage Grillé',    24.00, 'Plat',    TRUE, 'Risotto aux asperges, beurre blanc'),
@@ -144,14 +38,12 @@ INSERT INTO produits (nom, prix, categorie, disponible, description) VALUES
     ('Burger Maison',            18.00, 'Plat',    TRUE, 'Bœuf charolais, cheddar affiné, frites'),
     ('Risotto aux Truffes',      28.00, 'Plat',    TRUE, 'Truffe noire du Périgord, parmesan 24 mois'),
     ('Blanquette de Veau',       21.00, 'Plat',    TRUE, 'Recette traditionnelle, riz pilaf'),
-
     -- Desserts
     ('Crème Brûlée Maison',       8.50, 'Dessert', TRUE, 'Vanille Bourbon de Madagascar'),
     ('Café Gourmand',             9.00, 'Dessert', TRUE, 'Expresso + 3 mignardises'),
     ('Fondant au Chocolat',       9.50, 'Dessert', TRUE, 'Cœur coulant, glace vanille'),
     ('Île Flottante',             7.50, 'Dessert', TRUE, 'Caramel, pralines roses'),
     ('Assiette de Fromages',     11.00, 'Dessert', TRUE, 'Sélection affinée, miel, noix'),
-
     -- Boissons
     ('Eau Minérale 50cl',         3.00, 'Boisson', TRUE, 'Evian ou Perrier'),
     ('Jus de Fruits Frais',       5.50, 'Boisson', TRUE, 'Orange, pomme ou ananas'),
@@ -159,52 +51,145 @@ INSERT INTO produits (nom, prix, categorie, disponible, description) VALUES
     ('Café Expresso',             2.80, 'Boisson', TRUE, 'Café de spécialité'),
     ('Thé / Infusion',            3.20, 'Boisson', TRUE, 'Sélection de 8 parfums'),
     ('Vin Rouge - Bordeaux 75cl', 28.00,'Boisson', TRUE, 'Château Margaux 2019'),
-    ('Vin Blanc - Chablis 75cl',  24.00,'Boisson', TRUE, 'Premier Cru 2021')
-ON CONFLICT DO NOTHING;
+    ('Vin Blanc - Chablis 75cl',  24.00,'Boisson', TRUE, 'Premier Cru 2021');
 
 -- ─────────────────────────────────────────────────────────────
---  Stocks d'ingrédients
+--  3. STOCKS (12 ingrédients)
+--     3 alertes : Comté (3/5), Foie gras (0.8/2), Truffe (0.3/0.5)
 -- ─────────────────────────────────────────────────────────────
 INSERT INTO stocks (nom_ingredient, quantite, unite, seuil_alerte) VALUES
-    ('Farine de blé',         50.0,  'kg',    10.0),
-    ('Tomates fraîches',       8.0,  'kg',    15.0),
-    ('Fromage (comté)',         3.0,  'kg',     5.0),
-    ('Viande hachée',          25.0, 'kg',     8.0),
-    ('Saumon frais',           12.0, 'kg',     5.0),
-    ('Café en grains',         15.0, 'kg',     3.0),
-    ('Crème fraîche',           6.0, 'L',      3.0),
-    ('Foie gras',               2.5, 'kg',     2.0),
-    ('Truffe noire',            0.3, 'kg',     0.2),
+    ('Farine de blé',         50.0, 'kg',    10.0),
+    ('Tomates fraîches',      20.0, 'kg',     5.0),
+    ('Fromage (comté)',        3.0, 'kg',     5.0),
+    ('Viande hachée',         25.0, 'kg',     8.0),
+    ('Saumon frais',          12.0, 'kg',     5.0),
+    ('Café en grains',        15.0, 'kg',     3.0),
+    ('Crème fraîche',          6.0, 'L',      3.0),
+    ('Foie gras',              0.8, 'kg',     2.0),
+    ('Truffe noire',           0.3, 'kg',     0.5),
     ('Beurre',                 10.0, 'kg',     4.0),
     ('Œufs',                   60.0, 'unité', 20.0),
-    ('Huile d''olive',          8.0, 'L',      2.0)
-ON CONFLICT (nom_ingredient) DO NOTHING;
+    ('Huile d''olive',          8.0, 'L',      2.0);
 
 -- ─────────────────────────────────────────────────────────────
---  Commandes de démonstration
+--  4. COMPOSITION DES PLATS (produit → ingrédient + quantité)
 -- ─────────────────────────────────────────────────────────────
+INSERT INTO produit_ingredients (id_produit, id_stock, quantite) VALUES
+    -- Foie Gras de Canard (1)
+    (1, 8,  0.12), (1, 11, 1),  (1, 1,  0.04),
+    -- Tartare de Saumon (2)
+    (2, 5,  0.15), (2, 12, 0.02),
+    -- Entrecôte Frites Maison (6)
+    (6, 4,  0.3),  (6, 1,  0.2),  (6, 11, 1),   (6, 10, 0.05),
+    -- Saumon Sauvage Grillé (7)
+    (7, 5,  0.2),  (7, 12, 0.02), (7, 7,  0.05),
+    -- Burger Maison (10)
+    (10, 4, 0.2),  (10, 1, 0.1),  (10, 3, 0.03), (10, 11, 1), (10, 10, 0.03),
+    -- Risotto aux Truffes (11)
+    (11, 9, 0.02), (11, 7, 0.1),  (11, 10, 0.03), (11, 1, 0.15),
+    -- Crème Brûlée Maison (13)
+    (13, 7, 0.1),  (13, 11, 2),   (13, 1, 0.03),
+    -- Café Gourmand (14)
+    (14, 6, 0.02), (14, 7, 0.03), (14, 1, 0.02),  (14, 10, 0.02), (14, 11, 1);
+
+-- ─────────────────────────────────────────────────────────────
+--  5. COMMANDES (6)
+--     Chaque total = somme(quantite × prix_unitaire) de ses lignes
+-- ─────────────────────────────────────────────────────────────
+
+-- C1 — Table 2 (Occupée) — En cours — 4 lignes
+-- 2× Saumon Grillé(24) + 1× Crème Brûlée(8.5) + 2× Café Gourmand(9) + 1× Vin Blanc(24)
+-- = 48 + 8.5 + 18 + 24 = 98.50
 INSERT INTO commandes (id_table, date_commande, statut, total, serveur) VALUES
-    (2, NOW() - INTERVAL '45 minutes', 'En cours',   67.50, 'Marie - 101'),
-    (6, NOW() - INTERVAL '1 hour',     'En cours',   89.00, 'Thomas - 102'),
-    (1, NOW() - INTERVAL '2 hours',    'Payée',      45.30, 'Marie - 101'),
-    (3, NOW() - INTERVAL '3 hours',    'Payée',     112.00, 'Lucas - 103'),
-    (5, NOW() - INTERVAL '1 day',      'Payée',      38.50, 'Thomas - 102'),
-    (4, NOW() - INTERVAL '1 day',      'Annulée',    0.00,  'Lucas - 103');
+    (2, NOW() - INTERVAL '45 minutes', 'En cours', 98.50, 'Marie');
+INSERT INTO lignes_commande (id_commande, id_produit, quantite, prix_unitaire) VALUES
+    (1, 7,  2, 24.00),
+    (1, 13, 1,  8.50),
+    (1, 14, 2,  9.00),
+    (1, 24, 1, 24.00);
 
--- Lignes des commandes actives
-INSERT INTO lignes_commande (id_commande, id_produit, quantite, prix_unitaire, notes) VALUES
-    -- Commande 1 (table 2, en cours)
-    (1, 1,  1, 18.50, NULL),           -- Foie Gras
-    (1, 7,  2, 24.00, 'Sans sauce'),   -- 2x Saumon
-    (1, 13, 2,  8.50, NULL),           -- 2x Crème Brûlée
-    -- Commande 2 (table 6, en cours)
-    (2, 6,  2, 26.00, 'Bien cuit'),    -- 2x Entrecôte
-    (2, 14, 2,  9.00, NULL),           -- 2x Café Gourmand
-    (2, 23, 1, 28.00, NULL);           -- 1x Vin rouge
+-- C2 — Table 5 (Occupée) — En cours — 4 lignes
+-- 1× Foie Gras(18.5) + 1× Magret Canard(23) + 1× Fondant Chocolat(9.5) + 1× Café Expresso(2.8)
+-- = 18.5 + 23 + 9.5 + 2.8 = 53.80
+INSERT INTO commandes (id_table, date_commande, statut, total, serveur) VALUES
+    (5, NOW() - INTERVAL '30 minutes', 'En cours', 53.80, 'Thomas');
+INSERT INTO lignes_commande (id_commande, id_produit, quantite, prix_unitaire) VALUES
+    (2, 1,  1, 18.50),
+    (2, 9,  1, 23.00),
+    (2, 15, 1,  9.50),
+    (2, 21, 1,  2.80);
 
--- =============================================================
---  VUE UTILE : Tableau de bord CA du jour
--- =============================================================
+-- C3 — Table 7 (Occupée) — En cours — 5 lignes
+-- 3× Entrecôte(26) + 2× Risotto Truffes(28) + 6× Eau(3) + 2× Vin Rouge(28) + 3× Café Gourmand(9)
+-- = 78 + 56 + 18 + 56 + 27 = 235.00
+INSERT INTO commandes (id_table, date_commande, statut, total, serveur) VALUES
+    (7, NOW() - INTERVAL '2 hours', 'En cours', 235.00, 'Lucas');
+INSERT INTO lignes_commande (id_commande, id_produit, quantite, prix_unitaire) VALUES
+    (3, 6,  3, 26.00),
+    (3, 11, 2, 28.00),
+    (3, 18, 6,  3.00),
+    (3, 23, 2, 28.00),
+    (3, 14, 3,  9.00);
+
+-- C4 — Table 1 (Libre, payée) — Payée — 4 lignes
+-- 1× Tartare Saumon(14) + 1× Poulet Fermier(19.5) + 1× Crème Brûlée(8.5) + 1× Jus Fruits(5.5)
+-- = 14 + 19.5 + 8.5 + 5.5 = 47.50
+INSERT INTO commandes (id_table, date_commande, statut, total, serveur) VALUES
+    (1, NOW() - INTERVAL '3 hours', 'Payée', 47.50, 'Marie');
+INSERT INTO lignes_commande (id_commande, id_produit, quantite, prix_unitaire) VALUES
+    (4, 2,  1, 14.00),
+    (4, 8,  1, 19.50),
+    (4, 13, 1,  8.50),
+    (4, 19, 1,  5.50);
+
+-- C5 — Table 6 (Libre, payée) — Payée — 4 lignes
+-- 1× Velouté champignons(8.5) + 1× Burger Maison(18) + 1× Île Flottante(7.5) + 1× Eau(3)
+-- = 8.5 + 18 + 7.5 + 3 = 37.00
+INSERT INTO commandes (id_table, date_commande, statut, total, serveur) VALUES
+    (6, NOW() - INTERVAL '4 hours', 'Payée', 37.00, 'Thomas');
+INSERT INTO lignes_commande (id_commande, id_produit, quantite, prix_unitaire) VALUES
+    (5, 5,  1,  8.50),
+    (5, 10, 1, 18.00),
+    (5, 16, 1,  7.50),
+    (5, 18, 1,  3.00);
+
+-- C6 — Table 3 (Libre, payée) — Payée — 5 lignes
+-- 1× Foie Gras(18.5) + 1× Entrecôte(26) + 1× Fondant Chocolat(9.5) + 1× Vin Rouge(28) + 1× Café Gourmand(9)
+-- = 18.5 + 26 + 9.5 + 28 + 9 = 91.00
+INSERT INTO commandes (id_table, date_commande, statut, total, serveur) VALUES
+    (3, NOW() - INTERVAL '5 hours', 'Payée', 91.00, 'Lucas');
+INSERT INTO lignes_commande (id_commande, id_produit, quantite, prix_unitaire) VALUES
+    (6, 1,  1, 18.50),
+    (6, 6,  1, 26.00),
+    (6, 15, 1,  9.50),
+    (6, 23, 1, 28.00),
+    (6, 14, 1,  9.00);
+
+-- ─────────────────────────────────────────────────────────────
+--  6. PAIEMENTS + FACTURES (pour les 3 commandes Payée)
+-- ─────────────────────────────────────────────────────────────
+
+-- Paiement C4 (Table 1) — 47.50 € en CB
+INSERT INTO paiements (id_commande, mode_paiement, montant_recu, date_paiement) VALUES
+    (4, 'Carte Bancaire', 50.00, NOW() - INTERVAL '2 hours 50 minutes');
+INSERT INTO factures (id_commande, total, mode_paiement, date_generation) VALUES
+    (4, 47.50, 'Carte Bancaire', NOW() - INTERVAL '2 hours 50 minutes');
+
+-- Paiement C5 (Table 6) — 37.00 € en espèces
+INSERT INTO paiements (id_commande, mode_paiement, montant_recu, date_paiement) VALUES
+    (5, 'Espèces', 40.00, NOW() - INTERVAL '3 hours 50 minutes');
+INSERT INTO factures (id_commande, total, mode_paiement, date_generation) VALUES
+    (5, 37.00, 'Espèces', NOW() - INTERVAL '3 hours 50 minutes');
+
+-- Paiement C6 (Table 3) — 91.00 € en Mobile Money
+INSERT INTO paiements (id_commande, mode_paiement, montant_recu, date_paiement) VALUES
+    (6, 'Mobile Money', 100.00, NOW() - INTERVAL '4 hours 50 minutes');
+INSERT INTO factures (id_commande, total, mode_paiement, date_generation) VALUES
+    (6, 91.00, 'Mobile Money', NOW() - INTERVAL '4 hours 50 minutes');
+
+-- ─────────────────────────────────────────────────────────────
+--  7. VUES ANALYTIQUES
+-- ─────────────────────────────────────────────────────────────
 CREATE OR REPLACE VIEW vue_ca_journalier AS
 SELECT
     DATE(date_commande)         AS jour,
@@ -216,7 +201,6 @@ WHERE statut = 'Payée'
 GROUP BY DATE(date_commande)
 ORDER BY jour DESC;
 
--- Vue : produits les plus commandés
 CREATE OR REPLACE VIEW vue_top_produits AS
 SELECT
     p.nom,
@@ -230,7 +214,9 @@ WHERE c.statut = 'Payée'
 GROUP BY p.id_produit, p.nom, p.categorie
 ORDER BY total_commande DESC;
 
--- =============================================================
---  FINALISATION
--- =============================================================
-SELECT 'Base de données gestion_restaurant initialisée avec succès !' AS message;
+SELECT '✅ Seed terminé : ' ||
+       (SELECT COUNT(*)::text FROM tables_restaurant) || ' tables, ' ||
+       (SELECT COUNT(*)::text FROM produits) || ' produits, ' ||
+       (SELECT COUNT(*)::text FROM commandes) || ' commandes, ' ||
+       (SELECT COUNT(*)::text FROM paiements) || ' paiements'
+AS message;

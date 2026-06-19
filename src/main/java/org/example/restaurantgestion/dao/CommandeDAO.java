@@ -18,24 +18,34 @@ import java.util.Locale;
 public class CommandeDAO {
 
     public int creerCommande(int idTable) {
+        return creerCommande(idTable, null, null, 0);
+    }
+
+    public int creerCommande(int idTable, String serveur, String notes, double remise) {
         EntityManager em = HibernateUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            TableRestaurant table = em.find(TableRestaurant.class, idTable);
-            if (table == null) {
-                throw new IllegalArgumentException("Table introuvable : " + idTable);
-            }
-            if ("Occupée".equals(table.getStatut())) {
-                throw new IllegalStateException("La table " + idTable + " est déjà occupée");
-            }
 
             Commande commande = new Commande();
-            commande.setTable(table);
+            if (idTable > 0) {
+                TableRestaurant table = em.find(TableRestaurant.class, idTable);
+                if (table == null) {
+                    throw new IllegalArgumentException("Table introuvable : " + idTable);
+                }
+                if ("Occupée".equals(table.getStatut())) {
+                    throw new IllegalStateException("La table " + idTable + " est déjà occupée");
+                }
+                commande.setTable(table);
+                table.setStatut("Occupée");
+            }
+
             commande.setDateCommande(LocalDateTime.now());
             commande.setTotal(0.0);
             commande.setStatut("En cours");
-            table.setStatut("Occupée");
+            if (serveur != null) commande.setServeur(serveur);
+            if (notes != null) commande.setNotes(notes);
+            commande.setRemise(remise);
             em.persist(commande);
             tx.commit();
             System.out.println("Commande créée pour la table " + idTable);

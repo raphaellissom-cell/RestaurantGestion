@@ -6,11 +6,16 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import org.example.restaurantgestion.dao.IngredientDAO;
+import org.example.restaurantgestion.models.Stock;
+
+import java.util.List;
 
 public class StocksView extends VBox {
 
-    private final TableView<StockItem> tableStocks;
-    private final ObservableList<StockItem> stockList = FXCollections.observableArrayList();
+    private final TableView<Stock> tableStocks;
+    private final ObservableList<Stock> stockList = FXCollections.observableArrayList();
+    private final IngredientDAO ingredientDAO = new IngredientDAO();
 
     public StocksView() {
         this.setSpacing(20);
@@ -20,43 +25,63 @@ public class StocksView extends VBox {
         Label title = new Label("📦 Gestion des Stocks");
         title.getStyleClass().add("section-title");
 
-        // Tableau des stocks
         tableStocks = new TableView<>();
         tableStocks.getStyleClass().add("table-view");
         tableStocks.setPrefHeight(350);
 
-        TableColumn<StockItem, String> colNom = new TableColumn<>("Ingrédient");
-        colNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-        colNom.setPrefWidth(180);
+        TableColumn<Stock, String> colNom = new TableColumn<>("Ingrédient");
+        colNom.setCellValueFactory(cd -> {
+            Stock s = cd.getValue();
+            return new javafx.beans.property.SimpleStringProperty(
+                    s.getNomIngredient() + (s.getUnite() != null ? " (" + s.getUnite() + ")" : ""));
+        });
+        colNom.setPrefWidth(200);
 
-        TableColumn<StockItem, Integer> colQte = new TableColumn<>("Quantité");
-        colQte.setCellValueFactory(new PropertyValueFactory<>("quantite"));
+        TableColumn<Stock, Number> colQte = new TableColumn<>("Quantité");
+        colQte.setCellValueFactory(cd -> new javafx.beans.property.SimpleDoubleProperty(cd.getValue().getQuantite()));
         colQte.setPrefWidth(100);
+        colQte.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Number item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) setText(null);
+                else setText(String.format("%.1f", item.doubleValue()));
+            }
+        });
 
-        TableColumn<StockItem, Integer> colSeuil = new TableColumn<>("Seuil d'Alerte");
-        colSeuil.setCellValueFactory(new PropertyValueFactory<>("seuilAlerte"));
+        TableColumn<Stock, Number> colSeuil = new TableColumn<>("Seuil d'Alerte");
+        colSeuil.setCellValueFactory(cd -> new javafx.beans.property.SimpleDoubleProperty(cd.getValue().getSeuilAlerte()));
         colSeuil.setPrefWidth(120);
+        colSeuil.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Number item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) setText(null);
+                else setText(String.format("%.1f", item.doubleValue()));
+            }
+        });
 
-        TableColumn<StockItem, String> colEtat = new TableColumn<>("État");
-        colEtat.setCellValueFactory(new PropertyValueFactory<>("etat"));
+        TableColumn<Stock, String> colEtat = new TableColumn<>("État");
+        colEtat.setCellValueFactory(cd -> {
+            Stock s = cd.getValue();
+            double qte = s.getQuantite();
+            double seuil = s.getSeuilAlerte();
+            if (qte <= seuil / 2) return new javafx.beans.property.SimpleStringProperty("Critique");
+            else if (qte <= seuil) return new javafx.beans.property.SimpleStringProperty("Faible");
+            else return new javafx.beans.property.SimpleStringProperty("Normal");
+        });
         colEtat.setPrefWidth(120);
-
-        // Personnaliser le rendu de la colonne État
-        colEtat.setCellFactory(column -> new TableCell<StockItem, String>() {
+        colEtat.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
+                if (empty || item == null) { setText(null); setStyle(""); }
+                else {
                     setText(item);
-                    if ("Critique".equalsIgnoreCase(item)) {
-                        setStyle("-fx-text-fill: #DC2626; -fx-font-weight: 700;"); // Rouge foncé lisible
-                    } else if ("Faible".equalsIgnoreCase(item)) {
-                        setStyle("-fx-text-fill: #D97706; -fx-font-weight: 700;"); // Ambre/Orange foncé lisible
-                    } else {
-                        setStyle("-fx-text-fill: #059669; -fx-font-weight: 700;"); // Vert foncé lisible
+                    switch (item) {
+                        case "Critique" -> setStyle("-fx-text-fill: #DC2626; -fx-font-weight: 700;");
+                        case "Faible" -> setStyle("-fx-text-fill: #D97706; -fx-font-weight: 700;");
+                        default -> setStyle("-fx-text-fill: #059669; -fx-font-weight: 700;");
                     }
                 }
             }
@@ -65,12 +90,11 @@ public class StocksView extends VBox {
         tableStocks.getColumns().addAll(colNom, colQte, colSeuil, colEtat);
         tableStocks.setItems(stockList);
 
-        // Formulaire de réapprovisionnement
         HBox form = new HBox(15);
         form.setPadding(new Insets(10, 0, 10, 0));
 
         Label lblForm = new Label("Réapprovisionner :");
-        lblForm.setStyle("-fx-text-fill: #8E8E93; -fx-font-weight: bold; -fx-alignment: center-left; -fx-font-size: 14px;");
+        lblForm.setStyle("-fx-text-fill: #8E8E93; -fx-font-weight: bold; -fx-font-size: 14px;");
 
         TextField txtQteAjout = new TextField();
         txtQteAjout.setPromptText("Qté à ajouter...");
@@ -79,7 +103,7 @@ public class StocksView extends VBox {
         Button btnReappro = new Button("⚡ Ajouter au Stock");
         btnReappro.getStyleClass().add("button-primary");
         btnReappro.setOnAction(e -> {
-            StockItem selected = tableStocks.getSelectionModel().getSelectedItem();
+            Stock selected = tableStocks.getSelectionModel().getSelectedItem();
             if (selected == null) {
                 new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner un ingrédient dans la liste !", ButtonType.OK).showAndWait();
                 return;
@@ -89,11 +113,11 @@ public class StocksView extends VBox {
             if (qteStr.isEmpty()) return;
 
             try {
-                int qte = Integer.parseInt(qteStr);
-                selected.setQuantite(selected.getQuantite() + qte);
-                tableStocks.refresh();
+                double qte = Double.parseDouble(qteStr);
+                ingredientDAO.approvisionner(selected.getId(), qte);
+                chargerStocks();
                 txtQteAjout.clear();
-                new Alert(Alert.AlertType.INFORMATION, "Le stock de " + selected.getNom() + " a été mis à jour !", ButtonType.OK).showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Le stock de " + selected.getNomIngredient() + " a été mis à jour !", ButtonType.OK).showAndWait();
             } catch (NumberFormatException ex) {
                 new Alert(Alert.AlertType.ERROR, "Quantité invalide !", ButtonType.OK).showAndWait();
             }
@@ -101,46 +125,71 @@ public class StocksView extends VBox {
 
         form.getChildren().addAll(lblForm, txtQteAjout, btnReappro);
 
-        this.getChildren().addAll(title, tableStocks, form);
+        // --- Nouvel ingrédient form ---
+        Separator sep = new Separator();
+        Label lblNewIng = new Label("Nouvel ingrédient :");
+        lblNewIng.setStyle("-fx-text-fill: #8E8E93; -fx-font-weight: bold; -fx-font-size: 14px;");
 
+        HBox newForm = new HBox(15);
+        newForm.setPadding(new Insets(0, 0, 10, 0));
+
+        TextField txtNomIng = new TextField();
+        txtNomIng.setPromptText("Nom de l'ingrédient *");
+        txtNomIng.setPrefWidth(180);
+
+        TextField txtSeuil = new TextField();
+        txtSeuil.setPromptText("Seuil d'alerte *");
+        txtSeuil.setPrefWidth(120);
+
+        TextField txtUnite = new TextField();
+        txtUnite.setPromptText("Unité (g, ml, ...)");
+        txtUnite.setPrefWidth(120);
+
+        TextField txtQteInitiale = new TextField();
+        txtQteInitiale.setPromptText("Qté initiale *");
+        txtQteInitiale.setPrefWidth(100);
+
+        Button btnAjouterIng = new Button("+ Ajouter");
+        btnAjouterIng.getStyleClass().add("button-primary");
+        btnAjouterIng.setOnAction(e -> {
+            String nom = txtNomIng.getText().trim();
+            String seuilStr = txtSeuil.getText().trim();
+            String qteStr = txtQteInitiale.getText().trim();
+            String unite = txtUnite.getText().trim();
+
+            if (nom.isEmpty() || seuilStr.isEmpty() || qteStr.isEmpty()) {
+                new Alert(Alert.AlertType.WARNING, "Veuillez remplir tous les champs obligatoires (*).", ButtonType.OK).showAndWait();
+                return;
+            }
+            try {
+                double seuil = Double.parseDouble(seuilStr);
+                double qteInit = Double.parseDouble(qteStr);
+                Stock stock = new Stock();
+                stock.setNomIngredient(nom);
+                stock.setSeuilAlerte(seuil);
+                stock.setQuantite(qteInit);
+                stock.setUnite(unite.isEmpty() ? null : unite);
+                ingredientDAO.ajouterIngredient(stock);
+                chargerStocks();
+                txtNomIng.clear();
+                txtSeuil.clear();
+                txtUnite.clear();
+                txtQteInitiale.clear();
+                new Alert(Alert.AlertType.INFORMATION, "Ingrédient '" + nom + "' ajouté avec succès !", ButtonType.OK).showAndWait();
+            } catch (NumberFormatException ex) {
+                new Alert(Alert.AlertType.ERROR, "Seuil d'alerte et quantité doivent être des nombres valides.", ButtonType.OK).showAndWait();
+            }
+        });
+
+        newForm.getChildren().addAll(txtNomIng, txtSeuil, txtUnite, txtQteInitiale, btnAjouterIng);
+
+        this.getChildren().addAll(title, tableStocks, form, sep, lblNewIng, newForm);
         chargerStocks();
     }
 
     private void chargerStocks() {
         stockList.clear();
-        stockList.add(new StockItem("Farine", 50, 10));
-        stockList.add(new StockItem("Tomates", 8, 15));
-        stockList.add(new StockItem("Fromage râpé", 3, 5));
-        stockList.add(new StockItem("Viande hachée (kg)", 25, 8));
-        stockList.add(new StockItem("Saumon frais (kg)", 12, 5));
-        stockList.add(new StockItem("Café en grain (kg)", 15, 3));
-    }
-
-    public static class StockItem {
-        private final String nom;
-        private int quantite;
-        private int seuilAlerte;
-
-        public StockItem(String nom, int quantite, int seuilAlerte) {
-            this.nom = nom;
-            this.quantite = quantite;
-            this.seuilAlerte = seuilAlerte;
-        }
-
-        public String getNom() { return nom; }
-        public int getQuantite() { return quantite; }
-        public void setQuantite(int quantite) { this.quantite = quantite; }
-        public int getSeuilAlerte() { return seuilAlerte; }
-        public void setSeuilAlerte(int seuilAlerte) { this.seuilAlerte = seuilAlerte; }
-
-        public String getEtat() {
-            if (quantite <= seuilAlerte / 2) {
-                return "Critique";
-            } else if (quantite <= seuilAlerte) {
-                return "Faible";
-            } else {
-                return "Normal";
-            }
-        }
+        List<Stock> stocks = ingredientDAO.getAllStocks();
+        if (stocks != null) stockList.addAll(stocks);
     }
 }

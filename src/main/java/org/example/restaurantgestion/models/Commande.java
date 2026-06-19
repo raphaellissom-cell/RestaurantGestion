@@ -51,6 +51,12 @@ public class Commande {
     @Column(name = "remise")
     private double remise;
 
+    @Column
+    private String notes;
+
+    @Column
+    private String serveur;
+
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<LigneCommande> lignesCommande = new ArrayList<>();
 

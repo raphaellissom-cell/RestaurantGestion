@@ -42,4 +42,19 @@ public class ProduitDAO {
             em.close();
         }
     }
+
+    public Produit getProduitAvecIngredients(int id) {
+        EntityManager em = HibernateUtil.getEntityManager();
+        try {
+            return em.createQuery(
+                "SELECT p FROM Produit p LEFT JOIN FETCH p.ingredients i LEFT JOIN FETCH i.ingredient WHERE p.id = :id",
+                Produit.class
+            ).setParameter("id", id).getSingleResult();
+        } catch (Exception e) {
+            System.err.println("Erreur ProduitDAO.getProduitAvecIngredients : " + e.getMessage());
+            return null;
+        } finally {
+            em.close();
+        }
+    }
 }

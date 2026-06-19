@@ -20,6 +20,7 @@ public class TableDialog extends Stage {
     private final TextField txtNumero = new TextField();
     private final TextField txtCapacite = new TextField();
     private final ComboBox<String> cbStatut = new ComboBox<>();
+    private final TextField txtLocalisation = new TextField();
     private TableRestaurant editingTable = null;
 
     public TableDialog() {
@@ -40,6 +41,7 @@ public class TableDialog extends Stage {
         form.addRow(0, new Label("Numéro *"), txtNumero);
         form.addRow(1, new Label("Capacité *"), txtCapacite);
         form.addRow(2, new Label("Statut *"), cbStatut);
+        form.addRow(3, new Label("Localisation"), txtLocalisation);
 
         cbStatut.getItems().addAll("Libre", "Occupée", "Réservée");
         cbStatut.setValue("Libre");
@@ -48,6 +50,7 @@ public class TableDialog extends Stage {
             txtNumero.setText(String.valueOf(table.getNumeroTable()));
             txtCapacite.setText(String.valueOf(table.getCapacite()));
             cbStatut.setValue(table.getStatut());
+            txtLocalisation.setText(table.getLocalisation());
         }
 
         HBox actions = new HBox(8);
@@ -61,13 +64,13 @@ public class TableDialog extends Stage {
         actions.getChildren().addAll(btnOk, btnCancel);
 
         root.getChildren().addAll(form, actions);
-        Scene scene = new Scene(root, 500, 350);
+        Scene scene = new Scene(root, 500, 400);
         setScene(scene);
         // Force explicit size and prevent resizing
         setWidth(500);
-        setHeight(350);
+        setHeight(400);
         setMinWidth(500);
-        setMinHeight(350);
+        setMinHeight(400);
         setResizable(false);
         sizeToScene();
     }
@@ -77,13 +80,20 @@ public class TableDialog extends Stage {
             int numero = Integer.parseInt(txtNumero.getText().trim());
             int capacite = Integer.parseInt(txtCapacite.getText().trim());
             String statut = cbStatut.getValue();
+            String localisation = txtLocalisation.getText().trim();
             if (editingTable == null) {
-                tableDAO.ajouterTable(new TableRestaurant(0, numero, capacite, statut));
+                TableRestaurant nouvelle = new TableRestaurant();
+                nouvelle.setNumeroTable(numero);
+                nouvelle.setCapacite(capacite);
+                nouvelle.setStatut(statut);
+                nouvelle.setLocalisation(localisation.isEmpty() ? null : localisation);
+                tableDAO.ajouterTable(nouvelle);
                 new Alert(Alert.AlertType.INFORMATION, "Table ajoutée avec succès.", ButtonType.OK).showAndWait();
             } else {
                 editingTable.setNumeroTable(numero);
                 editingTable.setCapacite(capacite);
                 editingTable.setStatut(statut);
+                editingTable.setLocalisation(localisation.isEmpty() ? null : localisation);
                 tableDAO.modifierTable(editingTable);
                 new Alert(Alert.AlertType.INFORMATION, "Table modifiée avec succès.", ButtonType.OK).showAndWait();
             }

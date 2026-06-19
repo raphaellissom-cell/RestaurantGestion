@@ -5,7 +5,11 @@ import jakarta.persistence.EntityTransaction;
 import org.example.restaurantgestion.models.Commande;
 import org.example.restaurantgestion.models.LigneCommande;
 import org.example.restaurantgestion.models.Produit;
+import org.example.restaurantgestion.models.ProduitIngredient;
+import org.example.restaurantgestion.models.Stock;
 import org.example.restaurantgestion.util.HibernateUtil;
+
+import java.util.List;
 
 public class LigneCommandeDAO {
 
@@ -41,6 +45,9 @@ public class LigneCommandeDAO {
 
             em.persist(new LigneCommande(commande, produit, quantite, produit.getPrix()));
             commande.setTotal(commande.getTotal() + (produit.getPrix() * quantite));
+
+            deduireStock(em, produit, quantite);
+
             tx.commit();
             System.out.println(quantite + "x " + produit.getNom() + " ajoutés à la commande n°" + idCommande);
         } catch (Exception e) {
@@ -50,6 +57,21 @@ public class LigneCommandeDAO {
             throw new IllegalStateException("Impossible d'ajouter la ligne de commande", e);
         } finally {
             em.close();
+        }
+    }
+
+    private void deduireStock(EntityManager em, Produit produit, int quantiteCommandee) {
+        List<ProduitIngredient> ingredients = em.createQuery(
+                        "SELECT pi FROM ProduitIngredient pi JOIN FETCH pi.ingredient WHERE pi.produit.id = :id",
+                        ProduitIngredient.class)
+                .setParameter("id", produit.getId())
+                .getResultList();
+
+        for (ProduitIngredient pi : ingredients) {
+            Stock stock = pi.getIngredient();
+            double quantiteRetiree = pi.getQuantite() * quantiteCommandee;
+            stock.setQuantite(stock.getQuantite() - quantiteRetiree);
+            System.out.println("  Stock déduit : " + stock.getNomIngredient() + " -" + quantiteRetiree);
         }
     }
 }

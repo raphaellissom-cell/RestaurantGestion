@@ -1,0 +1,21 @@
+=========================================
+          monRestau
+       RESTAURANT GASTRONOMIQUE
+=========================================
+N° Commande  : #2
+Date         : 19/06/2026 14:53
+Table        : Table 6
+Statut       : En cours
+-----------------------------------------
+ PRODUITS CONSOMMÉS
+-----------------------------------------
+  Entrecôte Frites Maison   2 x   26.00 =    52.00
+  Café Gourmand             2 x    9.00 =    18.00
+  Vin Rouge - Bordeaux 75cl  1 x   28.00 =    28.00
+-----------------------------------------
+Sous-total                 :     98.00 FCFA
+TOTAL                      :     98.00 FCFA
+=========================================
+     Merci de votre visite !
+       À bientôt chez monRestau
+=========================================
