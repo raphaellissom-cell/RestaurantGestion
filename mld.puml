@@ -1,9 +1,4 @@
 @startuml
-!define table(x) entity x ## [b]
-!define primary_key(x) <b><color:#B03060><u>x</u></color></b>
-!define foreign_key(x) <color:#0066CC><i>x</i></color>
-!define not_null(x) <color:#888888>x</color>
-
 hide circle
 hide stereotypes
 skinparam linetype ortho
@@ -12,97 +7,96 @@ skinparam entity {
     BackgroundColor #F8F9FA
     BorderColor #444444
     FontSize 13
-    FontName Segoe UI
 }
 
-table("tables_restaurant") {
-  primary_key(id) INT PK
+entity "tables_restaurant" as tables {
+  + id : INT <<PK>>
   --
-  numero_table INT NOT NULL
-  capacite INT NOT NULL
-  statut VARCHAR(255) NOT NULL
-  localisation VARCHAR(255) NULL
+  numero_table : INT <<NOT NULL>>
+  capacite : INT <<NOT NULL>>
+  statut : VARCHAR(255) <<NOT NULL>>
+  localisation : VARCHAR(255)
 }
 
-table("produits") {
-  primary_key(id_produit) INT PK
+entity "produits" as produits {
+  + id_produit : INT <<PK>>
   --
-  nom VARCHAR(255) NOT NULL
-  prix FLOAT NOT NULL
-  categorie VARCHAR(255) NOT NULL
-  description TEXT NULL
-  image_path VARCHAR(255) NULL
-  disponible BOOLEAN NULL
-  created_at TIMESTAMP NULL
+  nom : VARCHAR(255) <<NOT NULL>>
+  prix : FLOAT <<NOT NULL>>
+  categorie : VARCHAR(255) <<NOT NULL>>
+  description : TEXT
+  image_path : VARCHAR(255)
+  disponible : BOOLEAN
+  created_at : TIMESTAMP
 }
 
-table("stocks") {
-  primary_key(id_stock) INT PK
+entity "stocks" as stocks {
+  + id_stock : INT <<PK>>
   --
-  nom_ingredient VARCHAR(255) NOT NULL
-  quantite FLOAT NOT NULL
-  seuil_alerte FLOAT NOT NULL
-  unite VARCHAR(255) NULL
-  last_updated TIMESTAMP NULL
+  nom_ingredient : VARCHAR(255) <<NOT NULL>>
+  quantite : FLOAT <<NOT NULL>>
+  seuil_alerte : FLOAT <<NOT NULL>>
+  unite : VARCHAR(255)
+  last_updated : TIMESTAMP
 }
 
-table("produit_ingredients") {
-  primary_key(id) INT PK
+entity "produit_ingredients" as prod_ing {
+  + id : INT <<PK>>
   --
-  foreign_key(id_produit) INT FK NOT NULL
-  foreign_key(id_stock) INT FK NOT NULL
-  quantite FLOAT NOT NULL
+  # id_produit : INT <<FK>> <<NOT NULL>>
+  # id_stock : INT <<FK>> <<NOT NULL>>
+  quantite : FLOAT <<NOT NULL>>
 }
 
-table("commandes") {
-  primary_key(id_commande) INT PK
+entity "commandes" as commandes {
+  + id_commande : INT <<PK>>
   --
-  foreign_key(id_table) INT FK NULL
-  date_commande TIMESTAMP NOT NULL
-  total FLOAT NOT NULL
-  statut VARCHAR(255) NOT NULL
-  remise FLOAT NULL
-  notes VARCHAR(255) NULL
-  serveur VARCHAR(255) NULL
+  # id_table : INT <<FK>>
+  date_commande : TIMESTAMP <<NOT NULL>>
+  total : FLOAT <<NOT NULL>>
+  statut : VARCHAR(255) <<NOT NULL>>
+  remise : FLOAT
+  notes : VARCHAR(255)
+  serveur : VARCHAR(255)
 }
 
-table("lignes_commande") {
-  primary_key(id_ligne) INT PK
+entity "lignes_commande" as lignes {
+  + id_ligne : INT <<PK>>
   --
-  foreign_key(id_commande) INT FK NOT NULL
-  foreign_key(id_produit) INT FK NULL
-  quantite INT NOT NULL
-  prix_unitaire FLOAT NOT NULL
+  # id_commande : INT <<FK>> <<NOT NULL>>
+  # id_produit : INT <<FK>>
+  quantite : INT <<NOT NULL>>
+  prix_unitaire : FLOAT <<NOT NULL>>
 }
 
-table("paiements") {
-  primary_key(id_paiement) INT PK
+entity "paiements" as paiements {
+  + id_paiement : INT <<PK>>
   --
-  foreign_key(id_commande) INT FK NOT NULL
-  mode_paiement VARCHAR(255) NOT NULL
-  montant_recu FLOAT NOT NULL
-  date_paiement TIMESTAMP NOT NULL
+  # id_commande : INT <<FK>> <<NOT NULL>>
+  mode_paiement : VARCHAR(255) <<NOT NULL>>
+  montant_recu : FLOAT <<NOT NULL>>
+  date_paiement : TIMESTAMP <<NOT NULL>>
 }
 
-table("factures") {
-  primary_key(id_facture) INT PK
+entity "factures" as factures {
+  + id_facture : INT <<PK>>
   --
-  foreign_key(id_commande) INT FK NOT NULL
-  total FLOAT NOT NULL
-  date_generation TIMESTAMP NOT NULL
-  numero_facture VARCHAR(255) NULL
-  mode_paiement VARCHAR(255) NULL
-  chemin_pdf VARCHAR(255) NULL
+  # id_commande : INT <<FK>> <<NOT NULL>>
+  total : FLOAT <<NOT NULL>>
+  date_generation : TIMESTAMP <<NOT NULL>>
+  numero_facture : VARCHAR(255)
+  mode_paiement : VARCHAR(255)
+  chemin_pdf : VARCHAR(255)
 }
 
 ' === Relationships ===
 
-tables_restaurant ||..o{ commandes : "1,N"
-commandes ||..|{ lignes_commande : "1,N"
-commandes ||..|| paiements : "1,1"
-commandes ||..|| factures : "1,1"
-produits ||..o{ lignes_commande : "1,N"
-produits ||..|{ produit_ingredients : "1,N"
-stocks ||..|{ produit_ingredients : "1,N"
+tables ||--o{ commandes : "1,N"
+commandes ||--|{ lignes : "1,N"
+commandes ||--|| paiements : "1,1"
+commandes ||--|| factures : "1,1"
+produits ||--o{ lignes : "1,N"
+produits ||--|{ prod_ing : "1,N"
+stocks ||--|{ prod_ing : "1,N"
 
 @enduml
