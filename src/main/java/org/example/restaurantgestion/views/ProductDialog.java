@@ -252,11 +252,11 @@ public class ProductDialog extends Stage {
     }
 
     private void enregistrerProduit() {
-        String nom = txtNom.getText().trim();
+        String nom = safeText(txtNom);
         String cat = cbCategorie.getValue();
-        String prixStr = txtPrix.getText().trim();
-        String desc = txtDescription.getText().trim();
-        String img = txtImagePath.getText().trim();
+        String prixStr = safeText(txtPrix);
+        String desc = safeText(txtDescription);
+        String img = safeText(txtImagePath);
         boolean disponible = chkDisponible.isSelected();
 
         if (nom.isEmpty() || prixStr.isEmpty()) {
@@ -293,6 +293,11 @@ public class ProductDialog extends Stage {
         } catch (NumberFormatException ex) {
             new Alert(Alert.AlertType.ERROR, "Le prix doit être un nombre valide.", ButtonType.OK).showAndWait();
         }
+    }
+
+    private static String safeText(TextInputControl tf) {
+        String t = tf.getText();
+        return t != null ? t.trim() : "";
     }
 
     private static class IngredientPanier {
