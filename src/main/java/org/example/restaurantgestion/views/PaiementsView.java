@@ -146,6 +146,10 @@ public class PaiementsView extends VBox {
         chargerCommandesActives();
     }
 
+    public void rafraichir() {
+        chargerCommandesActives();
+    }
+
     private void chargerCommandesActives() {
         commandesList.clear();
         List<Commande> all = commandeDAO.getHistoriqueVentes();

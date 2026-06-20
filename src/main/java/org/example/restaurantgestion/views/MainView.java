@@ -64,6 +64,8 @@ public class MainView extends BorderPane {
             tablesView.rafraichirTables();
         } else if (view instanceof CommandesView commandesView) {
             commandesView.chargerDonnees();
+        } else if (view instanceof PaiementsView paiementsView) {
+            paiementsView.rafraichir();
         }
     }
 
@@ -75,6 +77,7 @@ public class MainView extends BorderPane {
         }
         sidebar.setActiveButton(viewName);
         contentArea.getChildren().setAll(view);
+        rafraichirVueCourante();
     }
 
 
