@@ -17,6 +17,7 @@ import org.example.restaurantgestion.models.Commande;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.example.restaurantgestion.util.AlertUtil;
 
 public class CommandesView extends VBox {
 
@@ -205,10 +206,7 @@ public class CommandesView extends VBox {
                     new FactureDAO().creerFacture(c.getIdCommande(), c.getTotal());
                     CommandeDAO.genererFactureTXT(c);
 
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                        "Commande #" + c.getIdCommande() + " payée — " + String.format("%,.0f", c.getTotal()) + " FCFA",
-                        ButtonType.OK);
-                    alert.showAndWait();
+                    AlertUtil.showInfo("Commande #" + c.getIdCommande() + " payée — " + String.format("%,.0f", c.getTotal()) + " FCFA");
                     chargerDonnees();
                 });
             }

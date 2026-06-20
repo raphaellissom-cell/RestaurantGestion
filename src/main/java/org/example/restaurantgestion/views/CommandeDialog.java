@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import org.example.restaurantgestion.util.AlertUtil;
 
 public class CommandeDialog extends Stage {
 
@@ -240,7 +241,7 @@ public class CommandeDialog extends Stage {
     private void ajouterAuPanier() {
         Produit produit = cbItemName.getValue();
         if (produit == null) {
-            new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner un produit.", ButtonType.OK).showAndWait();
+            AlertUtil.showWarning("Veuillez sélectionner un produit.");
             return;
         }
         int quantite;
@@ -248,7 +249,7 @@ public class CommandeDialog extends Stage {
             quantite = Integer.parseInt(txtQuantity.getText().trim());
             if (quantite <= 0) throw new NumberFormatException();
         } catch (NumberFormatException ex) {
-            new Alert(Alert.AlertType.ERROR, "La quantité doit être un entier positif.", ButtonType.OK).showAndWait();
+            AlertUtil.showError("La quantité doit être un entier positif.");
             return;
         }
         panier.add(new PanierItem(produit, quantite));
@@ -285,14 +286,14 @@ public class CommandeDialog extends Stage {
 
     private void enregistrerCommande() {
         if (panier.isEmpty()) {
-            new Alert(Alert.AlertType.WARNING, "Ajoutez au moins un article à la commande.", ButtonType.OK).showAndWait();
+            AlertUtil.showWarning("Ajoutez au moins un article à la commande.");
             return;
         }
 
         boolean isDineIn = rbDineIn.isSelected();
         TableRestaurant table = cbTable.getValue();
         if (isDineIn && table == null) {
-            new Alert(Alert.AlertType.WARNING, "Veuillez choisir une table.", ButtonType.OK).showAndWait();
+            AlertUtil.showWarning("Veuillez choisir une table.");
             return;
         }
 
@@ -304,7 +305,7 @@ public class CommandeDialog extends Stage {
                 if (remise < 0) throw new NumberFormatException();
             }
         } catch (NumberFormatException ex) {
-            new Alert(Alert.AlertType.ERROR, "La remise doit être un nombre valide et positif.", ButtonType.OK).showAndWait();
+            AlertUtil.showError("La remise doit être un nombre valide et positif.");
             return;
         }
 
@@ -323,10 +324,10 @@ public class CommandeDialog extends Stage {
                 ligneCommandeDAO.ajouterLigneCommande(idCommande, item.produit.getId(), item.quantite);
             }
 
-            new Alert(Alert.AlertType.INFORMATION, "Commande n°" + idCommande + " enregistrée avec succès (" + panier.size() + " article(s)).", ButtonType.OK).showAndWait();
+            AlertUtil.showInfo("Commande n°" + idCommande + " enregistrée avec succès (" + panier.size() + " article(s)).");
             close();
         } catch (Exception ex) {
-            new Alert(Alert.AlertType.ERROR, "Impossible d'enregistrer la commande : " + ex.getMessage(), ButtonType.OK).showAndWait();
+            AlertUtil.showError("Impossible d'enregistrer la commande : " + ex.getMessage());
         }
     }
 

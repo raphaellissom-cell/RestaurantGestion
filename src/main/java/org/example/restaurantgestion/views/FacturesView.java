@@ -14,6 +14,7 @@ import org.example.restaurantgestion.models.Facture;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.example.restaurantgestion.util.AlertUtil;
 
 public class FacturesView extends VBox {
 
@@ -139,9 +140,7 @@ public class FacturesView extends VBox {
                 btnTxt.setOnAction(e -> {
                     Facture f = getTableView().getItems().get(getIndex());
                     String nom = CommandeDAO.genererFactureTXT(f.getCommande());
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                        "Facture générée : " + nom, ButtonType.OK);
-                    alert.showAndWait();
+                    AlertUtil.showInfo("Facture générée : " + nom);
                 });
             }
 

@@ -10,6 +10,7 @@ import org.example.restaurantgestion.dao.IngredientDAO;
 import org.example.restaurantgestion.models.Stock;
 
 import java.util.List;
+import org.example.restaurantgestion.util.AlertUtil;
 
 public class StocksView extends VBox {
 
@@ -105,7 +106,7 @@ public class StocksView extends VBox {
         btnReappro.setOnAction(e -> {
             Stock selected = tableStocks.getSelectionModel().getSelectedItem();
             if (selected == null) {
-                new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner un ingrédient dans la liste !", ButtonType.OK).showAndWait();
+                AlertUtil.showWarning("Veuillez sélectionner un ingrédient dans la liste !");
                 return;
             }
 
@@ -117,9 +118,9 @@ public class StocksView extends VBox {
                 ingredientDAO.approvisionner(selected.getId(), qte);
                 chargerStocks();
                 txtQteAjout.clear();
-                new Alert(Alert.AlertType.INFORMATION, "Le stock de " + selected.getNomIngredient() + " a été mis à jour !", ButtonType.OK).showAndWait();
+                AlertUtil.showInfo("Le stock de " + selected.getNomIngredient() + " a été mis à jour !");
             } catch (NumberFormatException ex) {
-                new Alert(Alert.AlertType.ERROR, "Quantité invalide !", ButtonType.OK).showAndWait();
+                AlertUtil.showError("Quantité invalide !");
             }
         });
 
@@ -158,7 +159,7 @@ public class StocksView extends VBox {
             String unite = txtUnite.getText().trim();
 
             if (nom.isEmpty() || seuilStr.isEmpty() || qteStr.isEmpty()) {
-                new Alert(Alert.AlertType.WARNING, "Veuillez remplir tous les champs obligatoires (*).", ButtonType.OK).showAndWait();
+                AlertUtil.showWarning("Veuillez remplir tous les champs obligatoires (*).");
                 return;
             }
             try {
@@ -175,9 +176,9 @@ public class StocksView extends VBox {
                 txtSeuil.clear();
                 txtUnite.clear();
                 txtQteInitiale.clear();
-                new Alert(Alert.AlertType.INFORMATION, "Ingrédient '" + nom + "' ajouté avec succès !", ButtonType.OK).showAndWait();
+                AlertUtil.showInfo("Ingrédient '" + nom + "' ajouté avec succès !");
             } catch (NumberFormatException ex) {
-                new Alert(Alert.AlertType.ERROR, "Seuil d'alerte et quantité doivent être des nombres valides.", ButtonType.OK).showAndWait();
+                AlertUtil.showError("Seuil d'alerte et quantité doivent être des nombres valides.");
             }
         });
 

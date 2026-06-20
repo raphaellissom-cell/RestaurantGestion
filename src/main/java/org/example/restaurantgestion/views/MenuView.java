@@ -17,6 +17,7 @@ import org.example.restaurantgestion.dao.ProduitDAO;
 import org.example.restaurantgestion.models.Produit;
 
 import java.util.List;
+import org.example.restaurantgestion.util.AlertUtil;
 
 public class MenuView extends VBox {
 
@@ -208,7 +209,7 @@ public class MenuView extends VBox {
     private void afficherDetailsProduit(Produit produit) {
         Produit produitComplet = produitDAO.getProduitAvecIngredients(produit.getId());
         if (produitComplet == null) {
-            new Alert(Alert.AlertType.ERROR, "Impossible de charger les détails du produit.", ButtonType.OK).showAndWait();
+            AlertUtil.showError("Impossible de charger les détails du produit.");
             return;
         }
 
@@ -349,22 +350,14 @@ public class MenuView extends VBox {
     }
 
     private void supprimerProduit(Produit produit) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-            "Supprimer le produit \"" + produit.getNom() + "\" ?\nCette action est irréversible.",
-            ButtonType.YES, ButtonType.NO);
-        confirm.setHeaderText(null);
-        confirm.showAndWait().ifPresent(response -> {
+        AlertUtil.showConfirm("Supprimer le produit \"" + produit.getNom() + "\" ?\nCette action est irréversible.").ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
                     produitDAO.supprimerProduit(produit.getId());
                     chargerDonnees();
-                    new Alert(Alert.AlertType.INFORMATION,
-                        "Produit \"" + produit.getNom() + "\" supprimé avec succès.",
-                        ButtonType.OK).showAndWait();
+                    AlertUtil.showInfo("Produit \"" + produit.getNom() + "\" supprimé avec succès.");
                 } catch (Exception ex) {
-                    new Alert(Alert.AlertType.ERROR,
-                        "Impossible de supprimer ce produit :\n" + ex.getMessage(),
-                        ButtonType.OK).showAndWait();
+                    AlertUtil.showError("Impossible de supprimer ce produit :\n" + ex.getMessage());
                 }
             }
         });

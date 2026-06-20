@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import org.example.restaurantgestion.util.AlertUtil;
 import org.example.restaurantgestion.dao.TableDAO;
 import org.example.restaurantgestion.models.TableRestaurant;
 
@@ -164,17 +165,13 @@ public class TablesView extends VBox {
 
     private void supprimerDepuisCarte(TableRestaurant table) {
         tableSelectionneeId = table.getId();
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-            "Supprimer la " + (table.getStatut().equalsIgnoreCase("Occupée") ? "table occupée" : "table") + " ?",
-            ButtonType.YES, ButtonType.NO);
-        confirm.setHeaderText(null);
-        confirm.showAndWait().ifPresent(response -> {
+        AlertUtil.showConfirm("Supprimer la " + (table.getStatut().equalsIgnoreCase("Occupée") ? "table occupée" : "table") + " ?").ifPresent(response -> {
             if (response == ButtonType.YES) {
                 try {
                     tableDAO.supprimerTable(tableSelectionneeId);
                     clearForm();
                 } catch (IllegalStateException ex) {
-                    new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK).showAndWait();
+                    AlertUtil.showError(ex.getMessage());
                 }
             }
         });

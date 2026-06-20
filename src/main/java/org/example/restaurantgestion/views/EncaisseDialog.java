@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.restaurantgestion.util.AlertUtil;
 import org.example.restaurantgestion.models.Commande;
 
 public class EncaisseDialog extends Stage {
@@ -87,13 +88,13 @@ public class EncaisseDialog extends Stage {
         try {
             double montantRecu = Double.parseDouble(txtMontant.getText().trim());
             if (montantRecu < commande.getTotal()) {
-                new Alert(Alert.AlertType.WARNING, "Montant insuffisant.", ButtonType.OK).showAndWait();
+                AlertUtil.showWarning("Montant insuffisant.");
                 return;
             }
             valide = true;
             close();
         } catch (NumberFormatException ex) {
-            new Alert(Alert.AlertType.ERROR, "Montant invalide.", ButtonType.OK).showAndWait();
+            AlertUtil.showError("Montant invalide.");
         }
     }
 

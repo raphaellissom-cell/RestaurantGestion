@@ -11,6 +11,7 @@ import org.example.restaurantgestion.dao.PaiementDAO;
 import org.example.restaurantgestion.models.Commande;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.example.restaurantgestion.util.AlertUtil;
 
 public class PaiementsView extends VBox {
 
@@ -184,19 +185,19 @@ public class PaiementsView extends VBox {
 
     private void validerPaiement() {
         if (activeCommande == null) {
-            new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner une commande à payer !", ButtonType.OK).showAndWait();
+            AlertUtil.showWarning("Veuillez sélectionner une commande à payer !");
             return;
         }
 
         try {
             double montantRecu = Double.parseDouble(txtMontantRecu.getText().trim());
             if (montantRecu < activeCommande.getTotal()) {
-                new Alert(Alert.AlertType.WARNING, "Le montant reçu est insuffisant.", ButtonType.OK).showAndWait();
+                AlertUtil.showWarning("Le montant reçu est insuffisant.");
                 return;
             }
 
             paiementDAO.enregistrerPaiement(activeCommande.getIdCommande(), cbModesPaiement.getValue(), montantRecu);
-            new Alert(Alert.AlertType.INFORMATION, "Paiement de " + String.format("%.2f FCFA", activeCommande.getTotal()) + " validé avec succès !", ButtonType.OK).showAndWait();
+            AlertUtil.showInfo("Paiement de " + String.format("%.2f FCFA", activeCommande.getTotal()) + " validé avec succès !");
 
             activeCommande = null;
             lblCommandeSelectionnee.setText("Aucune");
@@ -206,15 +207,15 @@ public class PaiementsView extends VBox {
 
             chargerCommandesActives();
         } catch (NumberFormatException ex) {
-            new Alert(Alert.AlertType.ERROR, "Le montant reçu est invalide.", ButtonType.OK).showAndWait();
+            AlertUtil.showError("Le montant reçu est invalide.");
         } catch (IllegalStateException ex) {
-            new Alert(Alert.AlertType.ERROR, "Impossible d'enregistrer le paiement : " + ex.getMessage(), ButtonType.OK).showAndWait();
+            AlertUtil.showError("Impossible d'enregistrer le paiement : " + ex.getMessage());
         }
     }
 
     private void imprimerFacture() {
         if (activeCommande == null) {
-            new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner une commande pour imprimer la facture !", ButtonType.OK).showAndWait();
+            AlertUtil.showWarning("Veuillez sélectionner une commande pour imprimer la facture !");
             return;
         }
         CommandeDAO.genererFactureTXT(activeCommande);

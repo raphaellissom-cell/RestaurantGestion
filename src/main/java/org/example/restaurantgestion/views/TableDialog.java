@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.restaurantgestion.util.AlertUtil;
 import org.example.restaurantgestion.dao.TableDAO;
 import org.example.restaurantgestion.models.TableRestaurant;
 
@@ -88,20 +89,20 @@ public class TableDialog extends Stage {
                 nouvelle.setStatut(statut);
                 nouvelle.setLocalisation(localisation.isEmpty() ? null : localisation);
                 tableDAO.ajouterTable(nouvelle);
-                new Alert(Alert.AlertType.INFORMATION, "Table ajoutée avec succès.", ButtonType.OK).showAndWait();
+                AlertUtil.showInfo("Table ajoutée avec succès.");
             } else {
                 editingTable.setNumeroTable(numero);
                 editingTable.setCapacite(capacite);
                 editingTable.setStatut(statut);
                 editingTable.setLocalisation(localisation.isEmpty() ? null : localisation);
                 tableDAO.modifierTable(editingTable);
-                new Alert(Alert.AlertType.INFORMATION, "Table modifiée avec succès.", ButtonType.OK).showAndWait();
+                AlertUtil.showInfo("Table modifiée avec succès.");
             }
             close();
         } catch (NumberFormatException ex) {
-            new Alert(Alert.AlertType.ERROR, "Numéro et capacité doivent être des entiers.", ButtonType.OK).showAndWait();
+            AlertUtil.showError("Numéro et capacité doivent être des entiers.");
         } catch (IllegalStateException ex) {
-            new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK).showAndWait();
+            AlertUtil.showError(ex.getMessage());
         }
     }
 }

@@ -21,6 +21,7 @@ import org.example.restaurantgestion.models.Stock;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.example.restaurantgestion.util.AlertUtil;
 
 public class ProductDialog extends Stage {
     private final ProduitDAO produitDAO = new ProduitDAO();
@@ -238,7 +239,7 @@ public class ProductDialog extends Stage {
     private void ajouterIngredientAuPanier() {
         Stock stock = cbIngredient.getValue();
         if (stock == null) {
-            new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner un ingrédient.", ButtonType.OK).showAndWait();
+            AlertUtil.showWarning("Veuillez sélectionner un ingrédient.");
             return;
         }
         try {
@@ -247,7 +248,7 @@ public class ProductDialog extends Stage {
             ingredientList.add(new IngredientPanier(stock, qte));
             txtQuantiteIng.clear();
         } catch (NumberFormatException ex) {
-            new Alert(Alert.AlertType.ERROR, "La quantité doit être un nombre valide et positif.", ButtonType.OK).showAndWait();
+            AlertUtil.showError("La quantité doit être un nombre valide et positif.");
         }
     }
 
@@ -260,7 +261,7 @@ public class ProductDialog extends Stage {
         boolean disponible = chkDisponible.isSelected();
 
         if (nom.isEmpty() || prixStr.isEmpty()) {
-            new Alert(Alert.AlertType.WARNING, "Veuillez remplir tous les champs obligatoires (*).", ButtonType.OK).showAndWait();
+            AlertUtil.showWarning("Veuillez remplir tous les champs obligatoires (*).");
             return;
         }
         try {
@@ -279,7 +280,7 @@ public class ProductDialog extends Stage {
                 }
                 editingProduit.setIngredients(newIngredients);
                 produitDAO.modifierProduit(editingProduit);
-                new Alert(Alert.AlertType.INFORMATION, "Produit modifié avec succès !", ButtonType.OK).showAndWait();
+                AlertUtil.showInfo("Produit modifié avec succès !");
             } else {
                 Produit p = new Produit(0, nom, prix, cat, desc, img);
                 p.setDisponible(disponible);
@@ -287,11 +288,11 @@ public class ProductDialog extends Stage {
                     p.getIngredients().add(new ProduitIngredient(p, ip.stock, ip.quantite));
                 }
                 produitDAO.ajouterProduit(p);
-                new Alert(Alert.AlertType.INFORMATION, "Produit ajouté avec succès !", ButtonType.OK).showAndWait();
+                AlertUtil.showInfo("Produit ajouté avec succès !");
             }
             close();
         } catch (NumberFormatException ex) {
-            new Alert(Alert.AlertType.ERROR, "Le prix doit être un nombre valide.", ButtonType.OK).showAndWait();
+            AlertUtil.showError("Le prix doit être un nombre valide.");
         }
     }
 
