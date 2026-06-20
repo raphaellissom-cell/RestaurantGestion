@@ -19,6 +19,11 @@ import java.util.*;
 
 public class VentesView extends VBox {
 
+    private final BarChart<String, Number> barChart;
+    private final PieChart pieChart;
+    private final XYChart.Series<String, Number> series;
+    private final ObservableList<PieChart.Data> pieChartData;
+
     public VentesView() {
         this.setSpacing(20);
         this.setPadding(new Insets(10));
@@ -35,25 +40,32 @@ public class VentesView extends VBox {
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Chiffre d'Affaires (FCFA)");
 
-        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart = new BarChart<>(xAxis, yAxis);
         barChart.setTitle("Chiffre d'Affaires Hebdomadaire");
         barChart.setLegendVisible(false);
         barChart.setPrefWidth(400);
 
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        chargerDonneesCA(series);
-        barChart.getData().add(series);
+        series = new XYChart.Series<>();
 
-        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-        chargerDonneesCategories(pieChartData);
+        pieChartData = FXCollections.observableArrayList();
 
-        PieChart pieChart = new PieChart(pieChartData);
+        pieChart = new PieChart(pieChartData);
         pieChart.setTitle("Répartition des Ventes par Catégorie");
         pieChart.setLabelsVisible(true);
         pieChart.setPrefWidth(350);
 
+        barChart.getData().add(series);
         chartsLayout.getChildren().addAll(barChart, pieChart);
         this.getChildren().addAll(title, chartsLayout);
+
+        rafraichir();
+    }
+
+    public void rafraichir() {
+        series.getData().clear();
+        chargerDonneesCA(series);
+        pieChartData.clear();
+        chargerDonneesCategories(pieChartData);
     }
 
     private void chargerDonneesCA(XYChart.Series<String, Number> series) {

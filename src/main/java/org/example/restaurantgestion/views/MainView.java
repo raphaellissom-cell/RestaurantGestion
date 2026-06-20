@@ -66,6 +66,8 @@ public class MainView extends BorderPane {
             commandesView.chargerDonnees();
         } else if (view instanceof PaiementsView paiementsView) {
             paiementsView.rafraichir();
+        } else if (view instanceof VentesView ventesView) {
+            ventesView.rafraichir();
         }
     }
 
