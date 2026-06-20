@@ -124,7 +124,10 @@ public class TablesView extends VBox {
 
         Button btnEdit = new Button("Modifier");
         btnEdit.getStyleClass().add("erp-action-btn");
-        btnEdit.setOnAction(e -> selectionnerTable(table));
+        btnEdit.setOnAction(e -> {
+            new TableDialog(table).showAndWait();
+            rafraichirTables();
+        });
 
         Button btnDelete = new Button("Supprimer");
         btnDelete.getStyleClass().addAll("erp-action-btn", "erp-action-btn-danger");

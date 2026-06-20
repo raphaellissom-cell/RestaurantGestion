@@ -19,6 +19,7 @@ import org.example.restaurantgestion.models.Produit;
 import org.example.restaurantgestion.models.ProduitIngredient;
 import org.example.restaurantgestion.models.Stock;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDialog extends Stage {
@@ -272,10 +273,11 @@ public class ProductDialog extends Stage {
                 editingProduit.setDescription(desc);
                 editingProduit.setImagePath(img);
                 editingProduit.setDisponible(disponible);
-                editingProduit.getIngredients().clear();
+                List<ProduitIngredient> newIngredients = new ArrayList<>();
                 for (IngredientPanier ip : ingredientList) {
-                    editingProduit.getIngredients().add(new ProduitIngredient(editingProduit, ip.stock, ip.quantite));
+                    newIngredients.add(new ProduitIngredient(editingProduit, ip.stock, ip.quantite));
                 }
+                editingProduit.setIngredients(newIngredients);
                 produitDAO.modifierProduit(editingProduit);
                 new Alert(Alert.AlertType.INFORMATION, "Produit modifié avec succès !", ButtonType.OK).showAndWait();
             } else {

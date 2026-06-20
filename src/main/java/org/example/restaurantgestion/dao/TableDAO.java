@@ -89,6 +89,7 @@ public class TableDAO {
             managed.setNumeroTable(table.getNumeroTable());
             managed.setCapacite(table.getCapacite());
             managed.setStatut(table.getStatut());
+            managed.setLocalisation(table.getLocalisation());
             tx.commit();
         } catch (Exception e) {
             if (tx.isActive()) {
